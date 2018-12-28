@@ -1,0 +1,55 @@
+{% extends "register/main.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="content-section">
+{#        <form method="post" enctype="multipart/form-data">#}
+{#            {% csrf_token %}#}
+{#            <fieldset class="form-group">#}
+{#                <label class="border-bottom mb-4">Join Today</label>#}
+{#                {{ form|crispy }}#}
+{#                {{ form_p|crispy }}#}
+{#            </fieldset>#}
+{#            <div class="form-group">#}
+{#                <button class="btn btn-outline-info" type="submit">Sign Up</button>#}
+{#            </div>#}
+{#        </form>#}
+
+
+
+{#        <form class="form-horizontal" method="POST" action="">#}
+{#            {% csrf_token %}#}
+{#            {{ formset.management_form }}#}
+{#            {% for form in formset %}#}
+{#            <div class="row form-row spacer">#}
+{#                <div class="col-2">#}
+{#                    <label>{{form.label}}</label>#}
+{#                </div>#}
+{#                <div class="col-4">#}
+{#                    <div class="input-group">#}
+{#                        {{form}}#}
+{#                        <div class="input-group-append">#}
+{#                            <button class="btn btn-success add-form-row">+</button>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#            {% endfor %}#}
+{#            <div class="row spacer">#}
+{#                <div class="col-4 offset-2">#}
+{#                    <button type="submit" class="btn btn-block btn-primary">Create</button>#}
+{#                </div>#}
+{#            </div>#}
+{#        </form>#}
+
+
+
+
+
+
+        <div class="border-top pt-3">
+            <small class="text-muted">
+                Already Have An Account <a class="ml-2" href="{% url 'login' %}">Sign In</a>
+            </small>
+        </div>
+    </div>
+{% endblock content %}

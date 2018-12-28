@@ -1,0 +1,17 @@
+{% extends "register/main.html" %}
+{% block content %}
+    <div class="content-section">
+        <form method="post">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <label class="border-bottom mb-4">Zarejestruj użytkownika</label>
+                <h2>Jaki typ użytkownika chcesz zarejestrować ?</h2>
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-info" type="submit" name="button" value="student">Uczeń</button>
+                <button class="btn btn-outline-info" type="submit" name="button" value="teacher">Nauczyciel</button>
+                <button class="btn btn-outline-info" type="submit" name="button" value="parent">Rodzic</button>
+            </div>
+        </form>
+    </div>
+{% endblock content %}

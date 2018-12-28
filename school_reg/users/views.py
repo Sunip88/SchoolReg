@@ -1,42 +1,45 @@
 from django.contrib.auth.models import User
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.views import View
-from django.views.generic import ListView, FormView, CreateView, DeleteView, DetailView
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
 from django.contrib.auth import views as auth_views, login, authenticate
 from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
-from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm, LoginForm
+from .forms import UserTeacherRegisterForm, UserUpdateForm, ProfileUpdateForm, StudentRegisterForm, \
+    ParentRegisterForm, UserParentStudentRegisterForm
+from register.models import Student, Teacher, Parent
+from django.forms import modelformset_factory
+import uuid
+import random
 
 
-class LoginUserView(View):
-    form_class = LoginForm
-
-    def get(self, request):
-        return render(request, 'users/login.html', {'form': self.form_class})
-
-    def post(self, request):
-        form = self.form_class(request.POST)
-        if form.is_valid():
-            email = form.cleaned_data.get('email')
-            username = User.objects.filter(email=email.lower()).first()
-            password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                login(request, user)
-                return redirect('main')
-            else:
-                messages.warning(request, 'Błędny login lub hasło')
-        return render(request, 'users/login.html', {'form': self.form_class})
+class LoginUserView(auth_views.LoginView):
+    redirect_authenticated_user = True
+    template_name = "users/login.html"
 
 
 class LogoutUserView(auth_views.LogoutView):
     template_name = 'users/logout.html'
 
 
-class RegisterUserView(View):
-    form_class = UserRegisterForm
+class RegisterChoiceView(View):
+
+    def get(self, request):
+        return render(request, 'users/register_choice.html')
+
+    def post(self, request):
+        button = request.POST.get('button')
+        if button == 'student':
+            return redirect('register-students')
+        elif button == 'teacher':
+            return redirect('register-teacher')
+        elif button == 'parent':
+            return redirect('register-parent')
+
+
+class RegisterTeacherView(View):
+    form_class = UserTeacherRegisterForm
 
     def get(self, request):
         form = self.form_class()
@@ -45,10 +48,79 @@ class RegisterUserView(View):
     def post(self, request):
         form = self.form_class(request.POST)
         if form.is_valid():
-            form.save()
-            email = form.cleaned_data.get('email')
-            messages.success(request, f'Konto dla {email} zostało utworzone')
-            return redirect('login')
+            user = form.save()
+            user.profile.role = 2
+            user.profile.save()
+            Teacher.objects.create(user_id=user.id)
+            username = form.cleaned_data.get('username')
+            messages.success(request, f'Konto dla {username} zostało utworzone')
+            return redirect('register')
+        return render(request, "users/register.html", {"form": form})
+
+
+class RegisterParentView(View):
+    form_class_u = UserParentStudentRegisterForm
+    form_class_p = ParentRegisterForm
+
+    def get(self, request):
+        form = self.form_class_u()
+        form_p = self.form_class_p()
+        return render(request, "users/register.html", {'form': form, 'form_p': form_p})
+
+    def post(self, request):
+        form = self.form_class_u(request.POST)
+        form_p = self.form_class_p(request.POST)
+        if form.is_valid() and form_p.is_valid():
+            user = form.save(commit=False)
+            random_password = uuid.uuid4().hex
+            user.set_password(random_password)
+            username = (str(user.first_name[0:3]) + str(user.last_name[0:3])).lower()
+            while User.objects.filter(username=username).exists():
+                username = username + str(random.randint(0, 100))
+            user.username = username
+            user.save()
+            user.profile.role = 1
+            user.profile.temp_password = random_password
+            user.profile.save()
+            parent = form_p.save(commit=False)
+            parent.user_id = user.id
+            form_p.save()
+            messages.success(request, f'Konto dla {user.username} zostało utworzone')
+            return redirect('register')
+        return render(request, "users/register.html", {'form': form, 'form_p': form_p})
+
+
+class RegisterStudentsView(View):
+    form_class_u = UserParentStudentRegisterForm
+    form_class_s = StudentRegisterForm
+    # StudentFormset = modelformset_factory(User, fields=('first_name', 'last_name'), extra=1) maybe later
+
+    def get(self, request):
+        form = self.form_class_u()
+        form_s = self.form_class_s()
+        return render(request, "users/register.html", {'form': form, 'form_s': form_s})
+
+    def post(self, request):
+        form = self.form_class_u(request.POST)
+        form_s = self.form_class_s(request.POST)
+        if form.is_valid() and form_s.is_valid():
+            year_of_birth = form_s.cleaned_data.get('year_of_birth')
+            user = form.save(commit=False)
+            random_password = uuid.uuid4().hex
+            user.set_password(random_password)
+            username = (str(user.first_name[0:3]) + str(user.last_name[0:3]) + str(year_of_birth)[2:]).lower()
+            while User.objects.filter(username=username).exists():
+                username = username + str(random.randint(0, 100))
+            user.username = username
+            user.save()
+            user.profile.role = 0
+            user.profile.temp_password = random_password
+            user.profile.save()
+            student = form_s.save(commit=False)
+            student.user_id = user.id
+            form_s.save()
+            messages.success(request, f'Konto dla {user.username} zostało utworzone')
+            return redirect('register-students')
         return render(request, "users/register.html", {"form": form})
 
 
@@ -57,6 +129,9 @@ class ProfileView(LoginRequiredMixin, View):
     def get(self, request):
         u_form = UserUpdateForm(instance=request.user)
         p_form = ProfileUpdateForm(instance=request.user.profile)
+        role = request.user.profile.role
+        if role == 0:
+            s_form = StudentRegisterForm(instance=request.user.student)
         return render(request, 'users/profile.html', locals())
 
     def post(self, request):
@@ -67,11 +142,12 @@ class ProfileView(LoginRequiredMixin, View):
             if u_form.is_valid() and p_form.is_valid():
                 u_form.save()
                 p_form.save()
+                if request.user.profile.role == 0:
+                    s_form = StudentRegisterForm(request.POST, instance=request.user.student)
+                    if s_form.is_valid():
+                        s_form.save()
                 messages.success(request, f'Twoje konto zostało zmodyfikowane')
                 return redirect('profile')
-        elif button == 'delete':
-            user = request.user
-            return redirect("delete-user", pk=user.id)
         elif button == 'change_password':
             return redirect("change-password")
 
@@ -80,7 +156,7 @@ class ChangePasswordView(LoginRequiredMixin, View):
 
     def get(self, request):
         form = PasswordChangeForm(request.user)
-        return render(request, "users/user_confirm_password_change.html", locals())
+        return render(request, "users/user_confirm_password_change.html", {'form': form})
 
     def post(self, request):
         form = PasswordChangeForm(request.user, request.POST)
@@ -93,14 +169,3 @@ class ChangePasswordView(LoginRequiredMixin, View):
             messages.error(request, "Prosze wprowadzić poprawne dane")
         return render(request, "users/user_confirm_password_change.html", locals())
 
-
-class ConfirmDeleteUserView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
-    model = User
-    success_url = reverse_lazy("login")
-    template_name = 'users/user_confirm_delete.html'
-
-    def test_func(self):
-        user = self.get_object()
-        if self.request.user.id == user.id:
-            return True
-        return False

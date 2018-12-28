@@ -1,34 +1,33 @@
 from django import forms
 from django.contrib.auth.models import User
-
+from register.models import Student, Parent
 from .models import Profile
 from django.contrib.auth.forms import UserCreationForm
 
 
-class UserRegisterForm(UserCreationForm):
-    email = forms.EmailField(required=True)
+class UserTeacherRegisterForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password1', 'password2', 'first_name', 'last_name']
-        labels = {
-            'email': 'Email',
-            'first_name': 'Imię',
-            'last_name': 'Nazwisko',
-        }
+        fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2']
 
-    def clean_email(self):
-        email = self.cleaned_data.get('email')
-        username = self.cleaned_data.get('username')
-        if email and User.objects.filter(email=email).exclude(username=username).exists():
-            raise forms.ValidationError(u'Taki adres email już istnieje.')
-        return email
+
+class ParentRegisterForm(forms.ModelForm):
+
+    class Meta:
+        model = Parent
+        fields = ['students']
+
+    def __init__(self, *args, **kwargs):
+        super(ParentRegisterForm, self).__init__(*args, **kwargs)
+        self.fields['students'].required = False
+        self.fields['students'].widget = forms.CheckboxSelectMultiple()
 
 
 class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name']
+        fields = ['first_name', 'last_name', 'email']
 
 
 class ProfileUpdateForm(forms.ModelForm):
@@ -37,10 +36,15 @@ class ProfileUpdateForm(forms.ModelForm):
         fields = ['image']
 
 
-class LoginForm(forms.ModelForm):
-    email = forms.EmailField(required=True)
-    password = forms.CharField(widget=forms.PasswordInput())
+class UserParentStudentRegisterForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['email', 'password']
+        fields = ['first_name', 'last_name']
+
+
+class StudentRegisterForm(forms.ModelForm):
+
+    class Meta:
+        model = Student
+        fields = ['year_of_birth', 'classes']

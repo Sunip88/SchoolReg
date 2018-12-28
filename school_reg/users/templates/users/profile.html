@@ -1,23 +1,38 @@
 {% extends "register/main.html" %}
 {% load crispy_forms_tags %}
+{% load users.extras %}
 {% block content %}
     <div class="content-section">
         <div class="media">
             <img class="rounded-circle account-img" src="{{ user.profile.image.url }}">
             <div class="media-body">
-                <h2 class="account-heading">{{ user.email }}</h2>
+                <h2 class="account-heading">{{ user.username }}</h2>
+                <h4>Imię i nazwisko: {{ user.first_name }} {{ user.last_name }}</h4>
+                <h4>Konto: {{ user.profile.get_role_display }}</h4>
+                {% if user.profile.role ==  0 %}
+                    <h4>Rocznik: {{ user.student.year_of_birth }}</h4>
+                    <h4>Klasa: {{ user|name_of_class }}</h4>
+                {% elif user.profile.role == 1 %}
+                    <h4>Uczniowie:
+                    {% for student in user|parent_students %}
+                         {{ student }}
+                    {% endfor %}
+                    </h4>
+                {% endif %}
             </div>
         </div>
+
+
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <fieldset class="form-group">
-                <label class="border-bottom mb-4">Informacja o profilu</label>
+                <label class="border-bottom mb-4">Edycja profilu</label>
                 {{ u_form|crispy }}
                 {{ p_form|crispy }}
+                {{ s_form|crispy }}
             </fieldset>
             <div class="form-group">
                 <button class="btn btn-outline-info" type="submit" name="button" value="update">Zatwierdź</button>
-                <button class="btn btn-outline-info float-right" type="submit" name="button" value="delete">Usuń konto</button>
                 <button class="btn btn-outline-info float-right" type="submit" name="button" value="change_password">Zmień hasło</button>
             </div>
         </form>

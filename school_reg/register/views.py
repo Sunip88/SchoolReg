@@ -6,3 +6,5 @@ class MainView(View):
 
     def get(self, request):
         return render(request, 'register/main.html')
+
+

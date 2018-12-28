@@ -1,18 +1,21 @@
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.contrib.auth.models import User
 from PIL import Image
 
-# PROFILE_ROLE_CHOICES = [
-#     (0, "Student"),
-#     (1, "Parent"),
-#     (2, "Teacher"),
-# ]
+
+PROFILE_ROLE_CHOICES = [
+    (0, "Student"),
+    (1, "Parent"),
+    (2, "Teacher"),
+]
 
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     image = models.ImageField(default='default.jpg', upload_to='profile_pics')
-    # role = models.IntegerField(choices=PROFILE_ROLE_CHOICES)
+    role = models.IntegerField(choices=PROFILE_ROLE_CHOICES, default=0)
+    temp_password = models.CharField(max_length=32)
     # active = models.BooleanField(default=False)
 
     def __str__(self):
@@ -28,14 +31,5 @@ class Profile(models.Model):
             img.save(self.image.path)
 
 
-class Student(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
 
-class Teacher(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-
-
-class Parent(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    students = models.ManyToManyField(Student)
