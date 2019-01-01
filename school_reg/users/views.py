@@ -169,3 +169,4 @@ class ChangePasswordView(LoginRequiredMixin, View):
             messages.error(request, "Prosze wprowadzić poprawne dane")
         return render(request, "users/user_confirm_password_change.html", locals())
 
+

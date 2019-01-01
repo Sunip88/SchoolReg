@@ -1,0 +1,22 @@
+{% extends "register/base.html" %}
+{% block content %}
+        <article class="media content-section">
+          <div class="media-body">
+                {% for classs in classes %}
+                    <div class="article-metadata">
+                        <a class="mr-2" href="{% url 'class-details' classs.id %}">{{ classs }}</a>
+                        {% if 'register' in perms %}
+                            {% if 'register.change_clasess' in perms %}
+                                <a class="small float-right" href="{% url 'class-edit' classs.id %}">modyfikuj</a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                {% endfor %}
+          </div>
+        </article>
+    {% if 'register' in perms %}
+        {% if 'register.add_clasess' in perms %}
+            <h3><a class="btn btn-outline-info small" href="{% url 'class-add' %}">dodaj</a></h3>
+        {% endif %}
+    {% endif %}
+{% endblock content %}

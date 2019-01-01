@@ -1,0 +1,22 @@
+{% extends "register/base.html" %}
+{% block content %}
+        <article class="media content-section">
+          <div class="media-body">
+                {% for subject in subjects %}
+                    <div class="article-metadata">
+                        <a class="mr-2" href="#">{{ subject }}</a>
+                        {% if 'register' in perms %}
+                            {% if 'register.change_subject' in perms %}
+                                <a class="small float-right" href="{% url 'subject-edit' subject.id %}">modyfikuj</a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                {% endfor %}
+          </div>
+        </article>
+    {% if 'register' in perms %}
+        {% if 'register.add_subject' in perms %}
+            <h3><a class="btn btn-outline-info small" href="{% url 'subject-add' %}">dodaj</a></h3>
+        {% endif %}
+    {% endif %}
+{% endblock content %}
