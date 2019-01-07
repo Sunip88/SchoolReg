@@ -66,9 +66,17 @@ class Parent(models.Model):
         return f'{self.user.first_name} {self.user.last_name}'
 
 
+class GradeCategory(models.Model):
+    name = models.CharField(max_length=16)
+
+    def __str__(self):
+        return self.name
+
+
 class Grades(models.Model):
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    category = models.ForeignKey(GradeCategory, on_delete=models.CASCADE)
     grade = models.FloatField(choices=GRADES)
 
     def __str__(self):

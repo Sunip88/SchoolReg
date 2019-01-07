@@ -1,0 +1,45 @@
+{% extends "register/base.html" %}
+{% block content %}
+        <div class="content-section">
+            <div class="media">
+                <div class="media-body">
+                    <h2 class="account-heading">Klasa: {{ detail_class.name }}</h2>
+                    <h4>Opis: {{ detail_class.description }}</h4>
+                    <h4>Wychowawca: {{ detail_class.educator }}</h4>
+                    <h4>Przedmiot: {{ subject.name }}</h4>
+                    <h4>Nauczyciel przedmiotu: </h4>
+                </div>
+            </div>
+            <article class="media content-section">
+              <div class="media-body">
+
+                        <div class="article-metadata">
+                            <ol>
+
+                                {% for student in students %}
+                                    <li>
+                                    <form method="post" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        <a href="#">{{ student }}</a><br>{{ form }}
+                                    <button class="btn btn-outline-info" type="submit" name="button" value="{{ student.id }}">Dodaj</button>
+                                    </form>
+                                    </li>
+                                {% endfor %}
+
+                            </ol>
+{#                            <a class="mr-2" href="#">{{ classs }}</a>#}
+    {#                        {% if 'register' in perms %}#}
+    {#                            {% if 'register.change_clasess' in perms %}#}
+    {#                                <a class="small float-right" href="{% url 'class-edit' classs.id %}">modyfikuj</a>#}
+    {#                            {% endif %}#}
+    {#                        {% endif %}#}
+                        </div>
+              </div>
+            </article>
+        </div>
+{#    {% if 'register' in perms %}#}
+{#        {% if 'register.add_clasess' in perms %}#}
+{#            <h3><a class="btn btn-outline-info small" href="{% url 'class-add' %}">dodaj</a></h3>#}
+{#        {% endif %}#}
+{#    {% endif %}#}
+{% endblock content %}

@@ -3,7 +3,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, UpdateView
-from .models import Classes, Subject
+
+from .forms import AddGradeForm
+from .models import Classes, Subject, Student, GradeCategory
 from django.contrib import messages
 
 
@@ -72,3 +74,40 @@ class EditSubjectView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     fields = '__all__'
     template_name = 'register/add_class.html'
     success_url = reverse_lazy("subject-view")
+
+
+class AddGradeCategoryView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+    permission_required = 'register.add_gradecategory'
+    model = GradeCategory
+    fields = '__all__'
+    template_name = 'register/add_class.html'
+    success_url = reverse_lazy("add-grade-category")
+
+
+class AddGradesClass(View):
+    form_class = AddGradeForm
+
+    def get(self, request, id_class):
+        detail_class = get_object_or_404(Classes, id=id_class)
+        students = Student.objects.all()
+        subject = detail_class.subject_set.all().first()
+        form = self.form_class()
+        cxt = {'detail_class': detail_class, 'students': students, 'subject': subject, 'form': form}
+        return render(request, 'register/detail_classes_add_grade.html', cxt)
+
+    def post(self, request, id_class):
+        form = self.form_class(request.POST)
+        detail_class = get_object_or_404(Classes, id=id_class)
+        students = Student.objects.all()
+        subject = detail_class.subject_set.all().first()
+        cxt = {'detail_class': detail_class, 'students': students, 'subject': subject, 'form': form}
+        if form.is_valid():
+            button = request.POST.get('button')
+            student = get_object_or_404(Student, id=button)
+            new_grade = form.save(commit=False)
+            new_grade.subject = subject
+            new_grade.student = student
+            new_grade.save()
+            messages.success(request, 'Dodano ocenę')
+            return redirect('class-grade-add', id_class=id_class)
+        return render(request, 'register/detail_classes_add_grade.html', cxt)
