@@ -1,4 +1,5 @@
 {% extends "register/base.html" %}
+{% load register.extras %}
 {% block content %}
         <div class="content-section">
             <div class="media">
@@ -15,7 +16,8 @@
 {#                    </select>#}
 {#                    </form>#}
                     </h4>
-                    <h4>Nauczyciel przedmiotu: </h4>
+                    {% teacher_class_subject subject detail_class as teacher %}
+                    <h4>Nauczyciel przedmiotu: {{ teacher }}</h4>
                 </div>
             </div>
             <article class="media content-section">

@@ -32,6 +32,20 @@ class TeacherSubjectsClassesView(View):
         return render(request, 'register/teacher_class_subject.html', {'teacher': teacher, 'subjects': subjects})
 
 
+class TeacherGradesView(View):
+    def get(self, request, subject_id, class_id):
+        subject = get_object_or_404(Subject, id=subject_id)
+        student_class = get_object_or_404(Classes, id=class_id)
+        students = student_class.student_set.all()
+        categories = GradeCategory.objects.all()
+        ctx = {'subject': subject,
+               'student_class': student_class,
+               'students': students,
+               'categories': categories,
+               'class_id': class_id}
+        return render(request, 'register/teacher_class_grades.html', ctx)
+
+
 class ClassView(View):
     def get(self, request):
         teacher = Teacher.objects.filter(user_id=request.user.id)

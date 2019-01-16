@@ -2,11 +2,12 @@
 {% block content %}
         <article class="media content-section">
           <div class="media-body">
+          <h5>Klasy których uczysz</h5>
           {% if subjects %}
                 {% for subject in subjects %}
                     <div class="article-metadata">
                     {% for class in subject.classes.all %}
-                        <a class="mr-2" href="#">
+                        <a class="mr-2" href="{% url 'class-details-grades' subject.id class.id %}">
                             {{ subject.name }} {{ class.name }} - {{ class.educator }}
                         </a>
                         <a class="mr-2" href="{% url 'class-grade-add' class.id subject.id %}">Dodawanie Ocen</a>
