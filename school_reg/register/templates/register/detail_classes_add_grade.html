@@ -6,7 +6,15 @@
                     <h2 class="account-heading">Klasa: {{ detail_class.name }}</h2>
                     <h4>Opis: {{ detail_class.description }}</h4>
                     <h4>Wychowawca: {{ detail_class.educator }}</h4>
-                    <h4>Przedmiot: {{ subject.name }}</h4>
+                    <h4>Przedmiot: {{ subject.name }}
+{#                    <form method="post" enctype="multipart/form-data">#}
+{#                    <select name="subject">#}
+{#                        {% for s in subject %}#}
+{#                        <option value="{{ s.name }}">{{ s.name }}</option>#}
+{#                        {% endfor %}#}
+{#                    </select>#}
+{#                    </form>#}
+                    </h4>
                     <h4>Nauczyciel przedmiotu: </h4>
                 </div>
             </div>
@@ -15,12 +23,11 @@
 
                         <div class="article-metadata">
                             <ol>
-
                                 {% for student in students %}
                                     <li>
                                     <form method="post" enctype="multipart/form-data">
                                         {% csrf_token %}
-                                        <a href="#">{{ student }}</a><br>{{ form }}
+                                        <a href="{% url 'student-details' student.id %}">{{ student }}</a><br>{{ form }}
                                     <button class="btn btn-outline-info" type="submit" name="button" value="{{ student.id }}">Dodaj</button>
                                     </form>
                                     </li>

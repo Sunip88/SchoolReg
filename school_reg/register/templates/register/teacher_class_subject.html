@@ -1,0 +1,26 @@
+{% extends "register/base.html" %}
+{% block content %}
+        <article class="media content-section">
+          <div class="media-body">
+          {% if subjects %}
+                {% for subject in subjects %}
+                    <div class="article-metadata">
+                    {% for class in subject.classes.all %}
+                        <a class="mr-2" href="#">
+                            {{ subject.name }} {{ class.name }} - {{ class.educator }}
+                        </a>
+                        <a class="mr-2" href="{% url 'class-grade-add' class.id subject.id %}">Dodawanie Ocen</a>
+                    {% endfor %}
+{#                        {% if 'register' in perms %}#}
+{#                            {% if 'register.change_clasess' in perms %}#}
+{#                                <a class="small float-right" href="{% url 'class-edit' classs.id %}">modyfikuj</a>#}
+{#                            {% endif %}#}
+{#                        {% endif %}#}
+                    </div>
+                {% endfor %}
+          {% else %}
+            <p>Brak przedmiotów</p>
+          {% endif %}
+          </div>
+        </article>
+{% endblock content %}

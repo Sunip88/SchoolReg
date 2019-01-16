@@ -5,7 +5,7 @@ from django.views import View
 from django.views.generic import CreateView, UpdateView
 
 from .forms import AddGradeForm
-from .models import Classes, Subject, Student, GradeCategory
+from .models import Classes, Subject, Student, GradeCategory, Teacher
 from django.contrib import messages
 
 
@@ -15,10 +15,31 @@ class MainView(View):
         return render(request, 'register/main.html')
 
 
-class ClassView(View):
-
+class TeacherPanelView(View):
     def get(self, request):
-        classes = Classes.objects.all()
+        teacher = Teacher.objects.filter(user_id=request.user.id)
+        return render(request, 'register/teacher_view.html', {"teacher": teacher})
+
+
+class TeacherSubjectsClassesView(View):
+    def get(self, request):
+        teacher = Teacher.objects.filter(user_id=request.user.id)
+        if teacher:
+            teacher = teacher.first()
+            subjects = teacher.subjects.all()
+        else:
+            subjects = []
+        return render(request, 'register/teacher_class_subject.html', {'teacher': teacher, 'subjects': subjects})
+
+
+class ClassView(View):
+    def get(self, request):
+        teacher = Teacher.objects.filter(user_id=request.user.id)
+        if teacher:
+            classes = teacher.classes_set.all()
+        else:
+            messages.success(request, 'Konto admin')
+            classes = Classes.objects.all()
         return render(request, 'register/classes.html', {'classes': classes})
 
 
@@ -87,19 +108,19 @@ class AddGradeCategoryView(LoginRequiredMixin, PermissionRequiredMixin, CreateVi
 class AddGradesClass(View):
     form_class = AddGradeForm
 
-    def get(self, request, id_class):
+    def get(self, request, id_class, id_subject):
         detail_class = get_object_or_404(Classes, id=id_class)
         students = Student.objects.all()
-        subject = detail_class.subject_set.all().first()
+        subject = get_object_or_404(Subject, id=id_subject)
         form = self.form_class()
         cxt = {'detail_class': detail_class, 'students': students, 'subject': subject, 'form': form}
         return render(request, 'register/detail_classes_add_grade.html', cxt)
 
-    def post(self, request, id_class):
+    def post(self, request, id_class, id_subject):
         form = self.form_class(request.POST)
         detail_class = get_object_or_404(Classes, id=id_class)
         students = Student.objects.all()
-        subject = detail_class.subject_set.all().first()
+        subject = get_object_or_404(Subject, id=id_subject)
         cxt = {'detail_class': detail_class, 'students': students, 'subject': subject, 'form': form}
         if form.is_valid():
             button = request.POST.get('button')
@@ -109,5 +130,18 @@ class AddGradesClass(View):
             new_grade.student = student
             new_grade.save()
             messages.success(request, 'Dodano ocenę')
-            return redirect('class-grade-add', id_class=id_class)
+            return redirect('class-grade-add', id_class=id_class, id_subject=id_subject)
         return render(request, 'register/detail_classes_add_grade.html', cxt)
+
+
+class StudentDetailView(View):
+
+    def get(self, request, pk):
+        student = get_object_or_404(Student, id=pk)
+        grades = student.grades_set.all()
+        subjects = {}
+        for g in grades:
+            if g.subject.id not in subjects.keys():
+                subjects[g.subject.id] = g.subject.name
+        ctx = {'student': student, 'grades': grades, 'subjects': subjects}
+        return render(request, 'register/student_details.html', ctx)

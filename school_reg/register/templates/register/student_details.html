@@ -1,0 +1,40 @@
+{% extends "register/base.html" %}
+{% load register.extras %}
+{% block content %}
+        <div class="content-section">
+            <div class="media">
+                <div class="media-body">
+                    <h2 class="account-heading">
+                        Imie i nazwisko: {{ student.user.first_name }} {{ student.user.last_name }}
+                    </h2>
+                    <h4>Klasa: {{ student.classes.name }}</h4>
+                    <h4>Wychowawca: {{ student.classes.educator }}</h4>
+                </div>
+            </div>
+            <article class="media content-section">
+              <div class="media-body">
+
+                        <div class="article-metadata">
+                            <ul>
+                                {% for key, value in subjects.items %}
+                                    <li><a href="#">{{ value }}</a>
+                                    {{ key|grades_all:student.id }}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+{#                            <a class="mr-2" href="#">{{ classs }}</a>#}
+    {#                        {% if 'register' in perms %}#}
+    {#                            {% if 'register.change_clasess' in perms %}#}
+    {#                                <a class="small float-right" href="{% url 'class-edit' classs.id %}">modyfikuj</a>#}
+    {#                            {% endif %}#}
+    {#                        {% endif %}#}
+                        </div>
+              </div>
+            </article>
+        </div>
+{#    {% if 'register' in perms %}#}
+{#        {% if 'register.add_clasess' in perms %}#}
+{#            <h3><a class="btn btn-outline-info small" href="{% url 'class-add' %}">dodaj</a></h3>#}
+{#        {% endif %}#}
+{#    {% endif %}#}
+{% endblock content %}

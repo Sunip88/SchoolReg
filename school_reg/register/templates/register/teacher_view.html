@@ -1,0 +1,17 @@
+{% extends "register/base.html" %}
+{% load crispy_forms_tags %}
+{% load register.extras %}
+{% block content %}
+    <div class="jumbotron bg-steel-2 text-center">
+        <h3 class="display-4">Co chcesz zrobic</h3>
+        <hr class="my-4">
+            <p class="lead">
+                <div class="d-flex justify-content-center flex-wrap">
+                    <a class="btn btn-lg btn-info btn-main m-2" href="#" role="button">Klasa wychowawstwo</a>
+                    <a class="btn btn-lg btn-info btn-main m-2" href="{% url 'teacher-subjects-view' %}" role="button">Klasy zajecia</a>
+                    <a class="btn btn-lg btn-info btn-main m-2" href="#" role="button">b</a>
+                    <a class="btn btn-lg btn-info btn-main m-2" href="#" role="button">c</a>
+                </div>
+            </p>
+    </div>
+{% endblock content %}
