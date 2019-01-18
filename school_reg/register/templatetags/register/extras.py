@@ -1,7 +1,7 @@
 #!/usr/bin/python3.7
 from django import template
-
-from register.models import Grades, Teacher
+from datetime import datetime
+from register.models import Grades, Teacher, Student
 
 register = template.Library()
 
@@ -27,6 +27,26 @@ def grades_category(grades, category):
             grades_str.append(str(g.get_grade_display()))
     result = ", ".join(grades_str)
     return result
+
+
+@register.filter()
+def student_presence(student, subject):
+    today = datetime.now().date()
+    student = Student.objects.get(user_id=student.user.id)
+    presence = student.presencelist_set.filter(subject_id=subject.id, day=today)
+    if len(presence) > 0:
+        return False
+    else:
+        return True
+
+
+@register.filter()
+def student_presence_get(student, subject):
+    today = datetime.now().date()
+    presence = student.presencelist_set.filter(subject_id=subject.id, day=today)
+    if presence:
+        presence = presence.first()
+    return presence.present
 
 
 @register.simple_tag

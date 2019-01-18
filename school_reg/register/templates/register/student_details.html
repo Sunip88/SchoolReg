@@ -17,7 +17,7 @@
                         <div class="article-metadata">
                             <ul>
                                 {% for key, value in subjects.items %}
-                                    <li><a href="#">{{ value }}</a>
+                                    <li><a href="{% url 'class-details-grades' key student.classes.id %}">{{ value }}</a>
                                     {{ key|grades_all:student.id }}
                                     </li>
                                 {% endfor %}

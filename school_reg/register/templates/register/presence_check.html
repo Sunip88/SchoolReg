@@ -1,0 +1,44 @@
+{% extends "register/base.html" %}
+{% load register.extras %}
+{% block content %}
+        <div class="content-section">
+            <div class="media">
+                <div class="media-body">
+                    <h2 class="account-heading">Klasa: {{ detail_class.name }}</h2>
+                    <h4>Opis: {{ detail_class.description }}</h4>
+                    <h4>Wychowawca: {{ detail_class.educator }}</h4>
+                    <h4>Przedmiot: {{ subject.name }}
+                    </h4>
+                    {% teacher_class_subject subject detail_class as teacher %}
+                    <h4>Nauczyciel przedmiotu: {{ teacher }}</h4>
+                    <h5>Dzisiaj: {{ today }}</h5>
+                </div>
+            </div>
+            <article class="media content-section">
+              <div class="media-body">
+                        <div class="article-metadata">
+                            <ol>
+                                {% for student in students %}
+                                    <li>
+                                    {% if student|student_presence:subject %}
+                                    <form method="post" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        <a href="{% url 'student-details' student.id %}">{{ student }}</a> {{ form }}
+                                    <button class="btn btn-outline-info" type="submit" name="button" value="{{ student.id }}">Dodaj</button>
+                                    </form>
+                                    {% else %}
+                                        <a href="{% url 'student-details' student.id %}">{{ student }}</a>
+                                        - {{ student|student_presence_get:subject }}
+                                        <a href="{% url 'class-presence-edit' detail_class.id subject.id student.id %}">
+                                            Edytuj obecność
+                                        </a>
+                                    {% endif %}
+                                    </li>
+                                {% endfor %}
+
+                            </ol>
+                        </div>
+              </div>
+            </article>
+        </div>
+{% endblock content %}

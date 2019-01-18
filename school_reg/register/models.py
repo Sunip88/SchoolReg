@@ -87,3 +87,4 @@ class PresenceList(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     day = models.DateField()
     present = models.NullBooleanField()
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)

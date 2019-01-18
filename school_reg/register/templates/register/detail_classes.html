@@ -14,7 +14,7 @@
                         <div class="article-metadata">
                             <ol>
                                 {% for student in students %}
-                                    <li><a href="#">{{ student }}</a></li>
+                                    <li><a href="{% url 'student-details' student.id %}">{{ student }}</a></li>
                                 {% endfor %}
                             </ol>
 {#                            <a class="mr-2" href="#">{{ classs }}</a>#}
