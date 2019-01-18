@@ -5,19 +5,23 @@
           <h5>Klasy których uczysz</h5>
           {% if subjects %}
                 {% for subject in subjects %}
-                    <div class="article-metadata">
                     {% for class in subject.classes.all %}
+                        <div class="article-metadata">
                         <a class="mr-2" href="{% url 'class-details-grades' subject.id class.id %}">
                             {{ subject.name }} {{ class.name }} - {{ class.educator }}
                         </a>
                         <a class="mr-2" href="{% url 'class-grade-add' class.id subject.id %}">Dodawanie Ocen</a>
+                        <a class="mr-2" href="{% url 'class-presence-add' class.id subject.id %}">
+                            Sprawdzenie obecności
+                        </a>
+                    </div>
                     {% endfor %}
 {#                        {% if 'register' in perms %}#}
 {#                            {% if 'register.change_clasess' in perms %}#}
 {#                                <a class="small float-right" href="{% url 'class-edit' classs.id %}">modyfikuj</a>#}
 {#                            {% endif %}#}
 {#                        {% endif %}#}
-                    </div>
+
                 {% endfor %}
           {% else %}
             <p>Brak przedmiotów</p>

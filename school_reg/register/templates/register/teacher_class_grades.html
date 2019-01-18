@@ -7,7 +7,8 @@
             <h4>Wychowawca: {{ student_class.educator }}</h4>
             <h4>Przedmiot: {{ subject.name }}</h4>
         <br/>
-        <h4><a href="{% url 'class-grade-add' class_id subject.id %}">dodawanie ocen</a></h4>
+        <h4><a href="{% url 'class-grade-add' class_id subject.id %}">Dodawanie ocen</a></h4>
+        <h4><a href="{% url 'class-presence-add' class_id subject.id %}">Sprawdzenie obecności</a></h4>
             <table cellpadding="6">
                 <tr>
                   <th>Imie i nazwisko</th>

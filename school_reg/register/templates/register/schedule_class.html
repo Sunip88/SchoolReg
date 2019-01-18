@@ -1,0 +1,32 @@
+{% extends "register/base.html" %}
+{% load register.extras %}
+{% block content %}
+{#    <article class="media content-section">#}
+{#        <div class="media-body">#}
+{#            <h2 class="account-heading">Klasa: {{ student_class.name }}</h2>#}
+{#            <h4>Wychowawca: {{ student_class.educator }}</h4>#}
+{#            <h4>Przedmiot: {{ subject.name }}</h4>#}
+{#        <br/>#}
+{#        <h4><a href="{% url 'class-grade-add' class_id subject.id %}">Dodawanie ocen</a></h4>#}
+{#        <h4><a href="{% url 'class-presence-add' class_id subject.id %}">Sprawdzenie obecności</a></h4>#}
+{#            <table cellpadding="6">#}
+{#                <tr>#}
+{#                  <th>Imie i nazwisko</th>#}
+{#                  {% for cat in categories %}#}
+{#                    <th>{{ cat.name }}</th>#}
+{#                  {% endfor %}#}
+{#                </tr>#}
+{#                {% for student in students %}#}
+{#              <tr>#}
+{#                  <td>{{ student }}</td>#}
+{##}
+{#                  {% for cat in categories %}#}
+{#                      {% grades_category_subject student cat subject as grades %}#}
+{#                      <td>{{ grades }}</td>#}
+{#                    {% endfor %}#}
+{#              </tr>#}
+{#              {% endfor %}#}
+{#            </table>#}
+{#        </div>#}
+{#    </article>#}
+{% endblock content %}

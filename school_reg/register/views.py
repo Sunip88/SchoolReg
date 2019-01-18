@@ -137,7 +137,7 @@ class AddGradesClass(View):
 
     def get(self, request, id_class, id_subject):
         detail_class = get_object_or_404(Classes, id=id_class)
-        students = Student.objects.all()
+        students = Student.objects.filter(classes_id=detail_class.id)
         subject = get_object_or_404(Subject, id=id_subject)
         form = self.class_form()
         ctx = {'detail_class': detail_class, 'students': students, 'subject': subject, 'form': form}
@@ -146,7 +146,7 @@ class AddGradesClass(View):
     def post(self, request, id_class, id_subject):
         form = self.class_form(request.POST)
         detail_class = get_object_or_404(Classes, id=id_class)
-        students = Student.objects.all()
+        students = Student.objects.filter(classes_id=detail_class.id)
         subject = get_object_or_404(Subject, id=id_subject)
         ctx = {'detail_class': detail_class, 'students': students, 'subject': subject, 'form': form}
         if form.is_valid():
@@ -179,7 +179,7 @@ class PresenceView(View):
 
     def get(self, request, id_class, id_subject):
         detail_class = get_object_or_404(Classes, id=id_class)
-        students = Student.objects.all()
+        students = Student.objects.filter(classes_id=detail_class.id)
         subject = get_object_or_404(Subject, id=id_subject)
         today = datetime.now().strftime('%Y-%m-%d')
         form = self.class_form()
@@ -189,7 +189,7 @@ class PresenceView(View):
     def post(self, request, id_class, id_subject):
         form = self.class_form(request.POST)
         detail_class = get_object_or_404(Classes, id=id_class)
-        students = Student.objects.all()
+        students = Student.objects.filter(classes_id=detail_class.id)
         subject = get_object_or_404(Subject, id=id_subject)
         today = datetime.now().date()
         ctx = {'detail_class': detail_class, 'students': students, 'subject': subject, 'form': form}

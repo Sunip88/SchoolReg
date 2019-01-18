@@ -22,6 +22,14 @@ GRADES = (
     (6, "6")
 )
 
+WEEKDAYS = [
+    (1, 'Poniedziałek'),
+    (2, 'Wtorek'),
+    (3, 'Środa'),
+    (4, 'Czwartek'),
+    (5, 'Piątek'),
+]
+
 
 class Classes(models.Model):
     educator = models.ForeignKey('register.Teacher', on_delete=models.CASCADE)
@@ -29,7 +37,7 @@ class Classes(models.Model):
     description = models.CharField(max_length=512, blank=True)
 
     def __str__(self):
-        return f'{self.name} - {self.educator}'
+        return f'{self.name}'
 
 
 class Subject(models.Model):
@@ -88,3 +96,27 @@ class PresenceList(models.Model):
     day = models.DateField()
     present = models.NullBooleanField()
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+
+
+class ClassRoom(models.Model):
+    name = models.CharField(max_length=16)
+
+    def __str__(self):
+        return self.name
+
+
+class WorkingHours(models.Model):
+    nr = models.IntegerField()
+    hours = models.CharField(max_length=16)
+
+    def __str__(self):
+        return self.hours
+
+
+class Schedule(models.Model):
+    classes = models.ForeignKey(Classes, on_delete=models.CASCADE)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    room = models.ForeignKey(ClassRoom, on_delete=models.CASCADE)
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    hours = models.ForeignKey(WorkingHours, on_delete=models.CASCADE)
+    weekday = models.IntegerField(choices=WEEKDAYS)
