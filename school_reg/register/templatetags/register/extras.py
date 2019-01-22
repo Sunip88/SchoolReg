@@ -1,7 +1,7 @@
 #!/usr/bin/python3.7
 from django import template
 from datetime import datetime
-from register.models import Grades, Teacher, Student
+from register.models import Grades, Teacher, Student, Schedule
 
 register = template.Library()
 
@@ -68,3 +68,30 @@ def teacher_class_subject(subject, detail_class):
     else:
         result = 'Brak wyników'
     return result
+
+
+@register.simple_tag
+def schedule_choice(classes, hours, weekday):
+    schedule = Schedule.objects.filter(classes_id=classes.id, weekday=weekday[0], hours=hours)
+    if schedule:
+        return schedule.first()
+    else:
+        return []
+
+
+@register.simple_tag
+def schedule_choice_teacher(teacher, hours, weekday):
+    schedule = Schedule.objects.filter(weekday=weekday[0], hours=hours, teacher=teacher)
+    if schedule:
+        return schedule.first()
+    else:
+        return []
+
+
+@register.simple_tag
+def schedule_choice_room(room, hours, weekday):
+    schedule = Schedule.objects.filter(weekday=weekday[0], hours=hours, room=room)
+    if schedule:
+        return schedule.first()
+    else:
+        return []

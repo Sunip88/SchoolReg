@@ -11,7 +11,7 @@
                         <a class="btn btn-lg btn-info btn-main m-2" href="{% url 'class-details' educator.id %}" role="button">Klasa wychowawstwo</a>
                     {% endif %}
                     <a class="btn btn-lg btn-info btn-main m-2" href="{% url 'teacher-subjects-view' %}" role="button">Klasy zajecia</a>
-                    <a class="btn btn-lg btn-info btn-main m-2" href="#" role="button">Plan zajęć</a>
+                    <a class="btn btn-lg btn-info btn-main m-2" href="{% url 'teacher-schedule' teacher.id %}" role="button">Plan zajęć</a>
                     <a class="btn btn-lg btn-info btn-main m-2" href="#" role="button">c</a>
                 </div>
             </p>

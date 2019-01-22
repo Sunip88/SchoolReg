@@ -2,27 +2,39 @@
 {% block content %}
         <article class="media content-section">
           <div class="media-body">
-          <h5>Klasy których uczysz</h5>
+          <h4>Klasy których uczysz</h4><br>
           {% if subjects %}
+              <table>
+                    <tr>
+                        <th>Przedmiot, klasa, wychowawca</th>
+                        <th>Dodawanie ocen</th>
+                        <th>Sprawdzanie obecnosci</th>
+                    </tr>
                 {% for subject in subjects %}
                     {% for class in subject.classes.all %}
-                        <div class="article-metadata">
-                        <a class="mr-2" href="{% url 'class-details-grades' subject.id class.id %}">
-                            {{ subject.name }} {{ class.name }} - {{ class.educator }}
-                        </a>
-                        <a class="mr-2" href="{% url 'class-grade-add' class.id subject.id %}">Dodawanie Ocen</a>
-                        <a class="mr-2" href="{% url 'class-presence-add' class.id subject.id %}">
-                            Sprawdzenie obecności
-                        </a>
-                    </div>
+                    <tr>
+                        <td>
+                            <a class="mr-2" href="{% url 'class-details-grades' subject.id class.id %}">
+                                {{ subject.name }} {{ class.name }} - {{ class.educator }}
+                            </a>
+                        </td>
+                        <td>
+                            <a class="mr-2" href="{% url 'class-grade-add' class.id subject.id %}">Dodawanie Ocen</a>
+                        </td>
+                        <td>
+                            <a class="mr-2" href="{% url 'class-presence-add' class.id subject.id %}">
+                                Sprawdzenie obecności
+                            </a>
+                        </td>
+                    </tr>
                     {% endfor %}
 {#                        {% if 'register' in perms %}#}
 {#                            {% if 'register.change_clasess' in perms %}#}
 {#                                <a class="small float-right" href="{% url 'class-edit' classs.id %}">modyfikuj</a>#}
 {#                            {% endif %}#}
 {#                        {% endif %}#}
-
                 {% endfor %}
+</table>
           {% else %}
             <p>Brak przedmiotów</p>
           {% endif %}

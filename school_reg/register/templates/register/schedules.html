@@ -1,0 +1,24 @@
+{% extends "register/base.html" %}
+{% load register.extras %}
+{% block content %}
+    <article class="media content-section">
+        <div class="media-body">
+            <h2>Plany zajec</h2>
+        <br/>
+        <h2>wg Klasy</h2>
+            {% for class in classes %}
+                <a href="{% url 'class-schedule' class.id %}">{{ class.name }}</a><br>
+            {% endfor %}
+        <br>
+        <h2>wg Nauczyciela</h2>
+            {% for teacher in teachers %}
+                <a href="{% url 'teacher-schedule' teacher.id %}">{{ teacher.user.first_name }} {{ teacher.user.last_name }}</a><br>
+            {% endfor %}
+        <br>
+        <h2>wg Sali</h2>
+            {% for room in rooms %}
+                <a href="{% url 'room-schedule' room.id %}">{{ room.name }}</a>,
+            {% endfor %}
+        </div>
+    </article>
+{% endblock content %}

@@ -6,6 +6,7 @@
                     <h2 class="account-heading">Klasa: {{ detail_class.name }}</h2>
                     <h4>Opis: {{ detail_class.description }}</h4>
                     <h4>Wychowawca: {{ detail_class.educator }}</h4>
+                    <h5><a href="{% url 'class-schedule' detail_class.id %}">Plan zajęć</a></h5>
                 </div>
             </div>
             <article class="media content-section">

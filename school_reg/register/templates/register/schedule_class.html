@@ -1,32 +1,68 @@
 {% extends "register/base.html" %}
 {% load register.extras %}
 {% block content %}
-{#    <article class="media content-section">#}
-{#        <div class="media-body">#}
-{#            <h2 class="account-heading">Klasa: {{ student_class.name }}</h2>#}
-{#            <h4>Wychowawca: {{ student_class.educator }}</h4>#}
-{#            <h4>Przedmiot: {{ subject.name }}</h4>#}
-{#        <br/>#}
-{#        <h4><a href="{% url 'class-grade-add' class_id subject.id %}">Dodawanie ocen</a></h4>#}
-{#        <h4><a href="{% url 'class-presence-add' class_id subject.id %}">Sprawdzenie obecności</a></h4>#}
-{#            <table cellpadding="6">#}
-{#                <tr>#}
-{#                  <th>Imie i nazwisko</th>#}
-{#                  {% for cat in categories %}#}
-{#                    <th>{{ cat.name }}</th>#}
-{#                  {% endfor %}#}
-{#                </tr>#}
-{#                {% for student in students %}#}
-{#              <tr>#}
-{#                  <td>{{ student }}</td>#}
-{##}
-{#                  {% for cat in categories %}#}
-{#                      {% grades_category_subject student cat subject as grades %}#}
-{#                      <td>{{ grades }}</td>#}
-{#                    {% endfor %}#}
-{#              </tr>#}
-{#              {% endfor %}#}
-{#            </table>#}
-{#        </div>#}
-{#    </article>#}
+    <article class="media content-section">
+        <div class="media-body">
+        {% if student_class %}
+            <h3 class="account-heading">Klasa: {{ student_class.name }}</h3>
+            <h4>Wychowawca: {{ student_class.educator }}</h4>
+        {% elif teacher %}
+            <h3 class="account-heading">Nauczyciel: {{ teacher.user.first_name }} {{ teacher.user.last_name }}</h3>
+        {% elif room %}
+            <h3 class="account-heading">Sala: {{ room.name }}</h3>
+        {% endif %}
+        <br/>
+            <table class="table" cellpadding="6">
+            {% for day in weekdays %}
+                {% if day.1 == weekdays.0.1 %}
+                    <tr>
+                    {% for d in weekdays %}
+                            <th>{{ d.1 }}</th>
+                    {% endfor %}
+                    </tr>
+                {% endif %}
+            {% endfor %}
+                {% for h in hours %}
+                    <tr>
+                        <td>{{ h.nr }}</td>
+                        <td>{{ h.hours }}</td>
+                        {% for day in weekdays_day %}
+                            {% if student_class %}
+                                {% schedule_choice student_class h day as schedule %}
+                                <td>
+                                {% if schedule %}
+                                    {{ schedule.subject.name }}<br>
+                                    <a href="{% url 'room-schedule' schedule.room.id %}">{{ schedule.room.name }}</a><br>
+                                    <a href="{% url 'teacher-schedule' schedule.teacher.id %}">
+                                    {{ schedule.teacher.user.first_name|first|upper }}{{ schedule.teacher.user.last_name|first|upper }}
+                                    </a><br>
+                                {% endif %}
+                                </td>
+                            {% elif teacher %}
+                                {% schedule_choice_teacher teacher h day as schedule %}
+                                <td>
+                                {% if schedule %}
+                                    {{ schedule.subject.name }}<br>
+                                    <a href="{% url 'class-schedule' schedule.classes.id %}">{{ schedule.classes.name }}</a><br>
+                                    <a href="{% url 'room-schedule' schedule.room.id %}">{{ schedule.room.name }}</a><br>
+                                {% endif %}
+                                </td>
+                            {% elif room %}
+                                {% schedule_choice_room room h day as schedule %}
+                                <td>
+                                {% if schedule %}
+                                    {{ schedule.subject.name }}<br>
+                                    <a href="{% url 'teacher-schedule' schedule.teacher.id %}">
+                                    {{ schedule.teacher.user.first_name|first|upper }}{{ schedule.teacher.user.last_name|first|upper }}
+                                    </a><br>
+                                    <a href="{% url 'class-schedule' schedule.classes.id %}">{{ schedule.classes.name }}</a><br>
+                                {% endif %}
+                                </td>
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </article>
 {% endblock content %}

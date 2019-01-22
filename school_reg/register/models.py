@@ -120,3 +120,19 @@ class Schedule(models.Model):
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     hours = models.ForeignKey(WorkingHours, on_delete=models.CASCADE)
     weekday = models.IntegerField(choices=WEEKDAYS)
+
+
+class Adverts(models.Model):
+    text = models.TextField()
+    title = models.CharField(max_length=64)
+    date = models.DateField(auto_now_add=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    deleted = models.BooleanField(default=False)
+
+
+class Notice(models.Model):
+    text = models.CharField(max_length=256)
+    from_user = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    to_user = models.ForeignKey(Student, on_delete=models.CASCADE)
+    accepted = models.NullBooleanField()
+    re_text = models.CharField(max_length=256)

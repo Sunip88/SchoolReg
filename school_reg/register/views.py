@@ -7,8 +7,19 @@ from django.views import View
 from django.views.generic import CreateView, UpdateView
 
 from .forms import AddGradeForm, PresenceForm
-from .models import Classes, Subject, Student, GradeCategory, Teacher, PresenceList
+from .models import Classes, Subject, Student, GradeCategory, Teacher, PresenceList, WorkingHours, Schedule, WEEKDAYS, \
+    ClassRoom
 from django.contrib import messages
+
+weekdays = [
+    (0, 'Nr'),
+    (0, 'Godz'),
+    (1, 'Poniedziałek'),
+    (2, 'Wtorek'),
+    (3, 'Środa'),
+    (4, 'Czwartek'),
+    (5, 'Piątek'),
+]
 
 
 class MainView(View):
@@ -240,3 +251,58 @@ class PresenceEditView(View):
             messages.success(request, 'Dodano ocenę')
             return redirect('class-presence-add', id_class=id_class, id_subject=id_subject)
         return render(request, 'register/presence_edit.html', ctx)
+
+
+class SchedulesView(View):
+
+    def get(self, request):
+        teachers = Teacher.objects.all()
+        classes = Classes.objects.all()
+        rooms = ClassRoom.objects.all()
+        ctx = {'teachers': teachers, 'classes': classes, 'rooms': rooms}
+        return render(request, 'register/schedules.html', ctx)
+
+
+class ScheduleClasses(View):
+
+    def get(self, request, id_class):
+        hours = WorkingHours.objects.all()
+        student_class = get_object_or_404(Classes, id=id_class)
+        schedule = Schedule.objects.all()
+
+        ctx = {'hours': hours,
+               'student_class': student_class,
+               'schedule': schedule,
+               'weekdays': weekdays,
+               'weekdays_day': WEEKDAYS}
+        return render(request, 'register/schedule_class.html', ctx)
+
+
+class ScheduleTeacherView(View):
+
+    def get(self, request, id_teacher):
+        hours = WorkingHours.objects.all()
+        teacher = get_object_or_404(Teacher, id=id_teacher)
+        schedule = Schedule.objects.all()
+
+        ctx = {'hours': hours,
+               'teacher': teacher,
+               'schedule': schedule,
+               'weekdays': weekdays,
+               'weekdays_day': WEEKDAYS}
+        return render(request, 'register/schedule_class.html', ctx)
+
+
+class ScheduleRoomView(View):
+
+    def get(self, request, id_room):
+        hours = WorkingHours.objects.all()
+        room = get_object_or_404(ClassRoom, id=id_room)
+        schedule = Schedule.objects.all()
+
+        ctx = {'hours': hours,
+               'room': room,
+               'schedule': schedule,
+               'weekdays': weekdays,
+               'weekdays_day': WEEKDAYS}
+        return render(request, 'register/schedule_class.html', ctx)

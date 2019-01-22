@@ -8,7 +8,7 @@
         <p class="lead">
             <div class="d-flex justify-content-center flex-wrap">
                 <a class="btn btn-lg btn-info btn-main m-2" href="{% url 'class-details' student_class.id %}" role="button">Klasa</a>
-                <a class="btn btn-lg btn-info btn-main m-2" href="#" role="button">Plan zajęć</a>
+                <a class="btn btn-lg btn-info btn-main m-2" href="{% url 'class-schedule' student_class.id %}" role="button">Plan zajęć</a>
                 <a class="btn btn-lg btn-info btn-main m-2" href="#" role="button">Kalendarz wydarzeń</a>
             </div>
         </p>
