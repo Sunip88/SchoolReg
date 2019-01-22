@@ -6,9 +6,9 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, UpdateView
 
-from .forms import AddGradeForm, PresenceForm
+from .forms import AddGradeForm, PresenceForm, AddAdvertForm, AddNoticeForm
 from .models import Classes, Subject, Student, GradeCategory, Teacher, PresenceList, WorkingHours, Schedule, WEEKDAYS, \
-    ClassRoom
+    ClassRoom, Adverts
 from django.contrib import messages
 
 weekdays = [
@@ -25,7 +25,8 @@ weekdays = [
 class MainView(View):
 
     def get(self, request):
-        return render(request, 'register/main.html')
+        adverts = Adverts.objects.all()
+        return render(request, 'register/main.html', {'adverts': adverts})
 
 
 class TeacherPanelView(View):
@@ -306,3 +307,42 @@ class ScheduleRoomView(View):
                'weekdays': weekdays,
                'weekdays_day': WEEKDAYS}
         return render(request, 'register/schedule_class.html', ctx)
+
+
+class AdvertAddView(View):
+    class_form = AddAdvertForm
+
+    def get(self, request):
+        form = self.class_form()
+        return render(request, 'register/add_advert.html', {'form': form})
+
+    def post(self, request):
+        form = self.class_form(request.POST)
+        if form.is_valid():
+            new_advert = form.save(commit=False)
+            new_advert.author = request.user
+            new_advert.save()
+            messages.success(request, 'Dodano ogloszenie')
+            return redirect('main')
+        return render(request, 'register/add_advert.html', {'form': form})
+
+
+class NoticeAddView(View):
+    class_form = AddNoticeForm
+
+    def get(self, request, id_student):
+        form = self.class_form()
+        student = get_object_or_404(Student, id=id_student)
+        return render(request, 'register/add_notice.html', {'form': form, 'student': student})
+
+    def post(self, request, id_student):
+        student = get_object_or_404(Student, id=id_student)
+        form = self.class_form(request.POST)
+        if form.is_valid():
+            new_notice = form.save(commit=False)
+            new_notice.from_user = request.user.teacher
+            new_notice.to_user = student
+            new_notice.save()
+            messages.success(request, 'Dodano uwage')
+            return redirect('student-details', pk=id_student)
+        return render(request, 'register/add_notice.html', {'form': form, 'student': student})

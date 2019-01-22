@@ -2,31 +2,21 @@
 {% load crispy_forms_tags %}
 {% load register.extras %}
 {% block content %}
-    Hello World!
-{#        {% for photo in photos %}#}
-{#        <article class="media content-section">#}
-{#            <img class="rounded-circle article-img" src="{{ photo.user.profile.image.url }}">#}
-{#            <div class="media-body">#}
-{#                <div class="article-metadata">#}
-{#                    <a class="mr-2" href="{% url 'user-photos' photo.user.id %}">{{ photo.user }}</a>#}
-{#                    <small class="text-muted">{{ photo.creation_date|date:"F d, Y" }} </small>#}
-{#                </div>#}
-{#                <a class="article-title" href="{% url 'photo-detail' photo.id %}">#}
-{#                    <img class="img-fluid" src="{{ photo.path.url }}"><br>#}
-{#                </a>#}
-{#                {% if not request.user.id in photo|likes_id %}#}
-{#                    <a class="btn btn-outline-info float-right" href="{% url 'like' photo.id %}">Polub</a>#}
-{#                {% else %}#}
-{#                    <p>Lubisz to zdjęcie!</p>#}
-{#                    <a class="btn btn-info float-right" href="{% url 'like' photo.id %}">Nie lubię</a>#}
-{#                {% endif %}#}
-{#                <br><br>#}
-{#                <a class="article-title" href="{% url 'photo-detail' photo.id %}">#}
-{#                    <p class="article-content">{{ photo.content }}</p>#}
-{#                </a>#}
-{#                <small class="text-muted">Ilość komentarzy: {{ photo|count_comments }}</small><br>#}
-{#                <small class="text-muted">LIKE: {{ photo|count_likes }}</small>#}
-{#            </div>#}
-{#        </article>#}
-{#    {% endfor %}#}
+    {% if adverts %}
+        <h3>Ogloszenia:</h3><br>
+        {% for advert in adverts %}
+            <article class="media content-section">
+              <div class="media-body">
+                <div class="article-metadata">
+                    <p class="mr-2">{{ advert.author.first_name }} {{ advert.author.last_name }}</p>
+                </div>
+                    <b><p class="article-title">{{ advert.title }}</p></b>
+                    <p class="article-content">{{ advert.text }}</p>
+                  <small class="text-muted">{{ advert.date|date:"F d, Y" }} </small>
+              </div>
+            </article>
+        {% endfor %}
+    {% else %}
+        <p>Brak ogloszen</p>
+    {% endif %}
 {% endblock content %}

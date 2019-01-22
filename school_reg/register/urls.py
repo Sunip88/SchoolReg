@@ -2,7 +2,7 @@ from django.urls import path
 from .views import MainView, ClassView, AddClassView, EditClassView, DetailsClassView, SubjectsView, AddSubjectView, \
     EditSubjectView, AddGradesClass, AddGradeCategoryView, StudentDetailView, TeacherPanelView, \
     TeacherSubjectsClassesView, TeacherGradesView, StudentView, PresenceView, PresenceEditView, ScheduleClasses, \
-    ScheduleTeacherView, ScheduleRoomView, SchedulesView
+    ScheduleTeacherView, ScheduleRoomView, SchedulesView, AdvertAddView, NoticeAddView
 
 urlpatterns = [
     path("", MainView.as_view(), name="main"),
@@ -14,6 +14,8 @@ urlpatterns = [
     path("add_class/", AddClassView.as_view(), name='class-add'),
     path("add_subject/", AddSubjectView.as_view(), name='subject-add'),
     path("add_grade_category/", AddGradeCategoryView.as_view(), name='add-grade-category'),
+    path("add_advert/", AdvertAddView.as_view(), name='add-advert'),
+    path("add_notice/<int:id_student>/", NoticeAddView.as_view(), name='add-notice'),
     path("edit_class/<int:pk>/", EditClassView.as_view(), name='class-edit'),
     path("edit_subject/<int:pk>/", EditSubjectView.as_view(), name='subject-edit'),
     path("detailed_class/<int:pk>/", DetailsClassView.as_view(), name='class-details'),
