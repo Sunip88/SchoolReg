@@ -1,0 +1,31 @@
+{% extends "register/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <h3>Uwagi dla {{ student.user.first_name }} {{ student.user.last_name }}</h3>
+    {% if notices %}
+        {% for notice in notices %}
+        <article class="media content-section">
+          <div class="media-body">
+            <div class="article-metadata">
+                <p class="mr-2">{{ notice.from_user.user.first_name }} {{ notice.from_user.user.last_name }}</p>
+            </div>
+                <p class="article-content">{{ notice.text }}</p>
+              {% if notice.accepted %}
+                  <br>
+                  <p>Zaakceptowano:</p>
+                <p class="article-content">{{ notice.re_text }}</p>
+              {% endif %}
+{#              <small class="text-muted">{{ advert.date|date:"F d, Y" }} </small>#}
+          </div><br>
+            </article>
+        {% endfor %}
+    {% else %}
+        <article class="media content-section">
+          <div class="media-body">
+            <div class="article-metadata">
+                <p class="mr-2">Brak uwag</p>
+            </div>
+          </div>
+        </article>
+    {% endif %}
+{% endblock content %}

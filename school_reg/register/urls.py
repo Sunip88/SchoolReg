@@ -2,13 +2,15 @@ from django.urls import path
 from .views import MainView, ClassView, AddClassView, EditClassView, DetailsClassView, SubjectsView, AddSubjectView, \
     EditSubjectView, AddGradesClass, AddGradeCategoryView, StudentDetailView, TeacherPanelView, \
     TeacherSubjectsClassesView, TeacherGradesView, StudentView, PresenceView, PresenceEditView, ScheduleClasses, \
-    ScheduleTeacherView, ScheduleRoomView, SchedulesView, AdvertAddView, NoticeAddView
+    ScheduleTeacherView, ScheduleRoomView, SchedulesView, AdvertAddView, NoticeAddView, ParentPanelView, \
+    NoticeParentView, NoticeTeacherView
 
 urlpatterns = [
     path("", MainView.as_view(), name="main"),
     path("classes/", ClassView.as_view(), name="class-view"),
     path("teacher_panel/", TeacherPanelView.as_view(), name="teacher-panel-view"),
     path("student_panel/", StudentView.as_view(), name="student-panel-view"),
+    path("parent_panel/", ParentPanelView.as_view(), name="parent-panel-view"),
     path("teacher_subjects/", TeacherSubjectsClassesView.as_view(), name="teacher-subjects-view"),
     path("subjects/", SubjectsView.as_view(), name="subject-view"),
     path("add_class/", AddClassView.as_view(), name='class-add'),
@@ -16,6 +18,8 @@ urlpatterns = [
     path("add_grade_category/", AddGradeCategoryView.as_view(), name='add-grade-category'),
     path("add_advert/", AdvertAddView.as_view(), name='add-advert'),
     path("add_notice/<int:id_student>/", NoticeAddView.as_view(), name='add-notice'),
+    path("notices/<int:id_student>/", NoticeParentView.as_view(), name='notices-parent'),
+    path("teacher_notices/", NoticeTeacherView.as_view(), name='notices-teacher'),
     path("edit_class/<int:pk>/", EditClassView.as_view(), name='class-edit'),
     path("edit_subject/<int:pk>/", EditSubjectView.as_view(), name='subject-edit'),
     path("detailed_class/<int:pk>/", DetailsClassView.as_view(), name='class-details'),

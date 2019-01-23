@@ -27,7 +27,7 @@
                 {% elif user.profile.role == 0 %}
                 <a class="nav-item nav-link" href="{% url 'student-panel-view' %}">Panel Ucznia</a>
                 {% elif user.profile.role == 1 %}
-                <a class="nav-item nav-link" href="#">Panel Rodzica</a>
+                <a class="nav-item nav-link" href="{% url 'parent-panel-view' %}">Panel Rodzica</a>
                 {% endif %}
                 <a class="nav-item nav-link" href="{% url 'schedules' %}">Plany zajec</a>
             </div>

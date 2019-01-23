@@ -1,0 +1,45 @@
+{% extends "register/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <h3>Uwagi dla {{ student.user.first_name }} {{ student.user.last_name }}</h3>
+    {% if notices %}
+        {% for notice in notices %}
+        <article class="media content-section">
+          <div class="media-body">
+            <div class="article-metadata">
+                <p class="mr-2">{{ notice.from_user.user.first_name }} {{ notice.from_user.user.last_name }}</p>
+            </div>
+                <p class="article-content">{{ notice.text }}</p>
+              {% if notice.accepted %}
+                  <br>
+                  <p>Zaakceptowano:</p>
+                <p class="article-content">{{ notice.re_text }}</p>
+              {% endif %}
+{#              <small class="text-muted">{{ advert.date|date:"F d, Y" }} </small>#}
+          </div><br>
+            </article>
+            {% if not notice.accepted %}
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <fieldset class="form-group">
+                    <label class="border-bottom mb-4">Odpowiedz</label>
+                    {{ form|crispy }}
+                </fieldset>
+                <div class="form-group">
+                    <button class="btn btn-outline-info" type="submit" name="button" value="{{ notice.id }}">Zatwierdź</button>
+                </div>
+            </form>
+            <br><br>
+            {% endif %}
+
+        {% endfor %}
+    {% else %}
+        <article class="media content-section">
+          <div class="media-body">
+            <div class="article-metadata">
+                <p class="mr-2">Brak uwag</p>
+            </div>
+          </div>
+        </article>
+    {% endif %}
+{% endblock content %}

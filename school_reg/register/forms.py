@@ -24,3 +24,9 @@ class AddNoticeForm(forms.ModelForm):
     class Meta:
         model = Notice
         fields = ['text']
+
+
+class AnswerNoticeForm(forms.ModelForm):
+    class Meta:
+        model = Notice
+        fields = ['accepted', 're_text']

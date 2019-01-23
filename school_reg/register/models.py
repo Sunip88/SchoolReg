@@ -136,3 +136,4 @@ class Notice(models.Model):
     to_user = models.ForeignKey(Student, on_delete=models.CASCADE)
     accepted = models.NullBooleanField()
     re_text = models.CharField(max_length=256)
+    # date

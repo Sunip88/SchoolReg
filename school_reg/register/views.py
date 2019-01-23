@@ -6,9 +6,9 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, UpdateView
 
-from .forms import AddGradeForm, PresenceForm, AddAdvertForm, AddNoticeForm
+from .forms import AddGradeForm, PresenceForm, AddAdvertForm, AddNoticeForm, AnswerNoticeForm
 from .models import Classes, Subject, Student, GradeCategory, Teacher, PresenceList, WorkingHours, Schedule, WEEKDAYS, \
-    ClassRoom, Adverts
+    ClassRoom, Adverts, Parent, Notice
 from django.contrib import messages
 
 weekdays = [
@@ -36,6 +36,14 @@ class TeacherPanelView(View):
         if educator:
             educator = educator.first()
         return render(request, 'register/teacher_view.html', {"teacher": teacher, "educator": educator})
+
+
+class ParentPanelView(View):
+    def get(self, request):
+        parent = Parent.objects.get(user_id=self.request.user.id)
+        children = parent.students.all()
+        ctx = {"parent": parent, "children": children}
+        return render(request, 'register/parent_view.html', ctx)
 
 
 class TeacherSubjectsClassesView(View):
@@ -346,3 +354,35 @@ class NoticeAddView(View):
             messages.success(request, 'Dodano uwage')
             return redirect('student-details', pk=id_student)
         return render(request, 'register/add_notice.html', {'form': form, 'student': student})
+
+
+class NoticeParentView(View):
+    class_form = AnswerNoticeForm
+
+    def get(self, request, id_student):
+        form = self.class_form()
+        student = get_object_or_404(Student, id=id_student)
+        notices = student.notice_set.all()
+        return render(request, 'register/notice_parent.html', {'student': student, 'notices': notices, 'form': form})
+
+    def post(self, request, id_student):
+        button = request.POST.get('button')
+        notice = Notice.objects.get(id=button)
+        student = get_object_or_404(Student, id=id_student)
+        notices = student.notice_set.all()
+        form = self.class_form(request.POST, instance=notice)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Potwierdzono uwage')
+            return redirect('notices', id_student=id_student)
+        return render(request, 'register/notice_parent.html', {'student': student, 'notices': notices, 'form': form})
+
+
+class NoticeTeacherView(View):
+
+    def get(self, request):
+        teacher = Teacher.objects.get(id=request.user.teacher.id)
+        notices = teacher.notice_set.all()
+        return render(request, 'register/notice_parent.html', {'teacher': teacher, 'notices': notices})
+
+
