@@ -383,6 +383,6 @@ class NoticeTeacherView(View):
     def get(self, request):
         teacher = Teacher.objects.get(id=request.user.teacher.id)
         notices = teacher.notice_set.all()
-        return render(request, 'register/notice_parent.html', {'teacher': teacher, 'notices': notices})
+        return render(request, 'register/notices_teacher.html', {'teacher': teacher, 'notices': notices})
 
 

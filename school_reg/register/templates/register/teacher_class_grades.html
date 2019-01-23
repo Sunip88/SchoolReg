@@ -18,7 +18,7 @@
                 </tr>
                 {% for student in students %}
               <tr>
-                  <td>{{ student }}</td>
+                  <td><a href="{% url 'student-details' student.id %}">{{ student }}</a></td>
 
                   {% for cat in categories %}
                       {% grades_category_subject student cat subject as grades %}
