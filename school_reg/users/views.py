@@ -6,8 +6,10 @@ from django.urls import reverse_lazy
 from django.contrib.auth import views as auth_views, login, authenticate
 from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
+
+from users.models import Messages
 from .forms import UserTeacherRegisterForm, UserUpdateForm, ProfileUpdateForm, StudentRegisterForm, \
-    ParentRegisterForm, UserParentStudentRegisterForm
+    ParentRegisterForm, UserParentStudentRegisterForm, MessagesAddForm
 from register.models import Student, Teacher, Parent
 from django.forms import modelformset_factory
 import uuid

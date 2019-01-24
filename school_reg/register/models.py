@@ -147,3 +147,11 @@ class Notice(models.Model):
     re_text = models.CharField(max_length=256)
     date = models.DateField(auto_now_add=True)
     deleted = models.BooleanField(default=False)
+
+
+class Announcements(models.Model):
+    text = models.TextField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateField(auto_now_add=True)
+    read = models.BooleanField(default=False)
+    deleted = models.BooleanField(default=False)

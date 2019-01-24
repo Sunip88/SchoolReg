@@ -4,12 +4,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import CreateView, UpdateView
+from django.views.generic import CreateView, UpdateView, ListView
 
 from .forms import AddGradeForm, PresenceForm, AddAdvertForm, AddNoticeForm, AnswerNoticeForm, AddClassAdvertForm, \
     EditAdvertForm, EditClassAdvertForm, EditNoticeForm
 from .models import Classes, Subject, Student, GradeCategory, Teacher, PresenceList, WorkingHours, Schedule, WEEKDAYS, \
-    ClassRoom, Adverts, Parent, Notice, AdvertsClass
+    ClassRoom, Adverts, Parent, Notice, AdvertsClass, Announcements
 from django.contrib import messages
 
 weekdays = [
@@ -178,6 +178,7 @@ class AddGradesClass(LoginRequiredMixin, View):
             new_grade.subject = subject
             new_grade.student = student
             new_grade.save()
+
             messages.success(request, 'Dodano ocenę')
             return redirect('class-grade-add', id_class=id_class, id_subject=id_subject)
         return render(request, 'register/detail_classes_add_grade.html', ctx)
@@ -486,3 +487,12 @@ class AdvertTeacherView(LoginRequiredMixin, View):
         adverts_class = AdvertsClass.objects.all()
         ctx = {'adverts_global': adverts_global, 'adverts_class': adverts_class}
         return render(request, 'register/advert_teacher.html', ctx)
+
+
+class AnnouncementView(View):
+
+    def get(self, request):
+        object_list = Announcements.objects.filter(user=request.user)
+        return render(request, 'register/announcements_list.html', {'object_list': object_list})
+
+

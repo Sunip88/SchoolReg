@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from register.models import Student, Parent
-from .models import Profile
+from .models import Profile, Messages
 from django.contrib.auth.forms import UserCreationForm
 
 
@@ -48,3 +48,9 @@ class StudentRegisterForm(forms.ModelForm):
     class Meta:
         model = Student
         fields = ['year_of_birth', 'classes']
+
+
+class MessagesAddForm(forms.ModelForm):
+    class Meta:
+        model = Messages
+        fields = ['content', 'send_to']
