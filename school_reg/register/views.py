@@ -23,14 +23,14 @@ weekdays = [
 ]
 
 
-class MainView(View):
+class MainView(LoginRequiredMixin, View):
 
     def get(self, request):
         adverts = Adverts.objects.all()
         return render(request, 'register/main.html', {'adverts': adverts})
 
 
-class TeacherPanelView(View):
+class TeacherPanelView(LoginRequiredMixin, View):
     def get(self, request):
         teacher = Teacher.objects.get(user_id=self.request.user.id)
         educator = teacher.classes_set.all()
@@ -39,7 +39,7 @@ class TeacherPanelView(View):
         return render(request, 'register/teacher_view.html', {"teacher": teacher, "educator": educator})
 
 
-class ParentPanelView(View):
+class ParentPanelView(LoginRequiredMixin, View):
     def get(self, request):
         parent = Parent.objects.get(user_id=self.request.user.id)
         children = parent.students.all()
@@ -47,7 +47,7 @@ class ParentPanelView(View):
         return render(request, 'register/parent_view.html', ctx)
 
 
-class TeacherSubjectsClassesView(View):
+class TeacherSubjectsClassesView(LoginRequiredMixin, View):
     def get(self, request):
         teacher = Teacher.objects.filter(user_id=request.user.id)
         if teacher:
@@ -58,7 +58,7 @@ class TeacherSubjectsClassesView(View):
         return render(request, 'register/teacher_class_subject.html', {'teacher': teacher, 'subjects': subjects})
 
 
-class TeacherGradesView(View):
+class TeacherGradesView(LoginRequiredMixin, View):
     def get(self, request, subject_id, class_id):
         subject = get_object_or_404(Subject, id=subject_id)
         student_class = get_object_or_404(Classes, id=class_id)
@@ -72,7 +72,7 @@ class TeacherGradesView(View):
         return render(request, 'register/teacher_class_grades.html', ctx)
 
 
-class StudentView(View):
+class StudentView(LoginRequiredMixin, View):
     def get(self, request):
         student = Student.objects.get(user_id=self.request.user.id)
         student_class = student.classes
@@ -80,7 +80,7 @@ class StudentView(View):
         return render(request, 'register/student_view.html', ctx)
 
 
-class ClassView(View):
+class ClassView(LoginRequiredMixin, View):
     def get(self, request):
         teacher = Teacher.objects.filter(user_id=request.user.id)
         if teacher:
@@ -107,7 +107,7 @@ class EditClassView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     success_url = reverse_lazy("class-view")
 
 
-class DetailsClassView(View):
+class DetailsClassView(LoginRequiredMixin, View):
 
     def get(self, request, pk):
         adverts = AdvertsClass.objects.filter(classes_id=pk)
@@ -117,7 +117,7 @@ class DetailsClassView(View):
         return render(request, 'register/detail_classes.html', ctx)
 
 
-class SubjectsView(View):
+class SubjectsView(LoginRequiredMixin, View):
 
     def get(self, request):
         subjects = Subject.objects.all()
@@ -154,7 +154,7 @@ class AddGradeCategoryView(LoginRequiredMixin, PermissionRequiredMixin, CreateVi
     success_url = reverse_lazy("add-grade-category")
 
 
-class AddGradesClass(View):
+class AddGradesClass(LoginRequiredMixin, View):
     class_form = AddGradeForm
 
     def get(self, request, id_class, id_subject):
@@ -183,7 +183,7 @@ class AddGradesClass(View):
         return render(request, 'register/detail_classes_add_grade.html', ctx)
 
 
-class StudentDetailView(View):
+class StudentDetailView(LoginRequiredMixin, View):
 
     def get(self, request, pk):
         student = get_object_or_404(Student, id=pk)
@@ -196,7 +196,7 @@ class StudentDetailView(View):
         return render(request, 'register/student_details.html', ctx)
 
 
-class PresenceView(View):
+class PresenceView(LoginRequiredMixin, View):
     class_form = PresenceForm
 
     def get(self, request, id_class, id_subject):
@@ -228,7 +228,7 @@ class PresenceView(View):
         return render(request, 'register/presence_check.html', ctx)
 
 
-class PresenceEditView(View):
+class PresenceEditView(LoginRequiredMixin, View):
     class_form = PresenceForm
 
     def get(self, request, id_class, id_subject, id_student):
@@ -264,7 +264,7 @@ class PresenceEditView(View):
         return render(request, 'register/presence_edit.html', ctx)
 
 
-class SchedulesView(View):
+class SchedulesView(LoginRequiredMixin, View):
 
     def get(self, request):
         teachers = Teacher.objects.all()
@@ -274,7 +274,7 @@ class SchedulesView(View):
         return render(request, 'register/schedules.html', ctx)
 
 
-class ScheduleClasses(View):
+class ScheduleClasses(LoginRequiredMixin, View):
 
     def get(self, request, id_class):
         hours = WorkingHours.objects.all()
@@ -289,7 +289,7 @@ class ScheduleClasses(View):
         return render(request, 'register/schedule_class.html', ctx)
 
 
-class ScheduleTeacherView(View):
+class ScheduleTeacherView(LoginRequiredMixin, View):
 
     def get(self, request, id_teacher):
         hours = WorkingHours.objects.all()
@@ -304,7 +304,7 @@ class ScheduleTeacherView(View):
         return render(request, 'register/schedule_class.html', ctx)
 
 
-class ScheduleRoomView(View):
+class ScheduleRoomView(LoginRequiredMixin, View):
 
     def get(self, request, id_room):
         hours = WorkingHours.objects.all()
@@ -319,7 +319,7 @@ class ScheduleRoomView(View):
         return render(request, 'register/schedule_class.html', ctx)
 
 
-class AdvertAddView(View):
+class AdvertAddView(LoginRequiredMixin, View):
     class_form = AddAdvertForm
 
     def get(self, request):
@@ -337,7 +337,7 @@ class AdvertAddView(View):
         return render(request, 'register/add_advert.html', {'form': form})
 
 
-class AdvertEditView(View):
+class AdvertEditView(LoginRequiredMixin, View):
     class_form = EditAdvertForm
 
     def get(self, request, id_advert):
@@ -355,7 +355,7 @@ class AdvertEditView(View):
         return render(request, 'register/add_advert.html', {'form': form})
 
 
-class AdvertClassAddView(View):
+class AdvertClassAddView(LoginRequiredMixin, View):
     class_form = AddClassAdvertForm
 
     def get(self, request, id_class):
@@ -376,7 +376,7 @@ class AdvertClassAddView(View):
         return render(request, 'register/add_advert.html', {'form': form, 'student_class': student_class})
 
 
-class AdvertClassEditView(View):
+class AdvertClassEditView(LoginRequiredMixin, View):
     class_form = EditClassAdvertForm
 
     def get(self, request, id_advert):
@@ -394,7 +394,7 @@ class AdvertClassEditView(View):
         return render(request, 'register/add_advert.html', {'form': form, 'advert_class': advert_class})
 
 
-class NoticeAddView(View):
+class NoticeAddView(LoginRequiredMixin, View):
     class_form = AddNoticeForm
 
     def get(self, request, id_student):
@@ -415,7 +415,7 @@ class NoticeAddView(View):
         return render(request, 'register/add_notice.html', {'form': form, 'student': student})
 
 
-class NoticeEditView(View):
+class NoticeEditView(LoginRequiredMixin, View):
     class_form = EditNoticeForm
 
     def get(self, request, id_notice):
@@ -433,7 +433,7 @@ class NoticeEditView(View):
         return render(request, 'register/add_notice.html', {'form': form, 'notice': notice})
 
 
-class NoticeParentView(View):
+class NoticeParentView(LoginRequiredMixin, View):
     class_form = AnswerNoticeForm
 
     def get(self, request, id_student):
@@ -455,7 +455,7 @@ class NoticeParentView(View):
         return render(request, 'register/notice_parent.html', {'student': student, 'notices': notices, 'form': form})
 
 
-class NoticeParentEditView(View):
+class NoticeParentEditView(LoginRequiredMixin, View):
     class_form = AnswerNoticeForm
 
     def get(self, request, id_notice):
@@ -473,14 +473,14 @@ class NoticeParentEditView(View):
         return render(request, 'register/add_notice.html', {'form': form, 'notice': notice})
 
 
-class NoticeTeacherView(View):
+class NoticeTeacherView(LoginRequiredMixin, View):
     def get(self, request):
         teacher = Teacher.objects.get(id=request.user.teacher.id)
         notices = teacher.notice_set.all()
         return render(request, 'register/notices_teacher.html', {'teacher': teacher, 'notices': notices})
 
 
-class AdvertTeacherView(View):
+class AdvertTeacherView(LoginRequiredMixin, View):
     def get(self, request):
         adverts_global = Adverts.objects.all()
         adverts_class = AdvertsClass.objects.all()

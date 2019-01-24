@@ -4,39 +4,40 @@
     <h3>Uwagi dla {{ student.user.first_name }} {{ student.user.last_name }}</h3>
     {% if notices %}
         {% for notice in notices %}
-        <article class="media content-section">
-          <div class="media-body">
-            <div class="article-metadata">
-                <p class="mr-2">{{ notice.from_user.user.first_name }} {{ notice.from_user.user.last_name }}
-                    {% if notice.accepted != None %}
-                    <a href="{% url 'notice-edit-parent' notice.id %}" class="float-right">Modyfikuj</a>
-                    {% endif %}
-                </p>
-                <small class="text-muted">{{ notice.date|date:"F d, Y" }} </small>
-            </div>
-                <p class="article-content">{{ notice.text }}</p>
-              {% if notice.accepted %}
-                  <br>
-                  <p>Zaakceptowano:</p>
-                <p class="article-content">{{ notice.re_text }}</p>
-              {% endif %}
+            {% if not notice.deleted %}
+                <article class="media content-section">
+                  <div class="media-body">
+                    <div class="article-metadata">
+                        <p class="mr-2">{{ notice.from_user.user.first_name }} {{ notice.from_user.user.last_name }}
+                            {% if notice.accepted != None %}
+                            <a href="{% url 'notice-edit-parent' notice.id %}" class="float-right">Modyfikuj</a>
+                            {% endif %}
+                        </p>
+                        <small class="text-muted">{{ notice.date|date:"F d, Y" }} </small>
+                    </div>
+                        <p class="article-content">{{ notice.text }}</p>
+                      {% if notice.accepted %}
+                          <br>
+                          <p>Zaakceptowano:</p>
+                        <p class="article-content">{{ notice.re_text }}</p>
+                      {% endif %}
 
-          </div><br>
-            </article>
-            {% if not notice.accepted %}
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <fieldset class="form-group">
-                    <label class="border-bottom mb-4">Odpowiedz</label>
-                    {{ form|crispy }}
-                </fieldset>
-                <div class="form-group">
-                    <button class="btn btn-outline-info" type="submit" name="button" value="{{ notice.id }}">Zatwierdź</button>
-                </div>
-            </form>
-            <br><br>
+                  </div><br>
+                </article>
+                {% if not notice.accepted %}
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <fieldset class="form-group">
+                        <label class="border-bottom mb-4">Odpowiedz</label>
+                        {{ form|crispy }}
+                    </fieldset>
+                    <div class="form-group">
+                        <button class="btn btn-outline-info" type="submit" name="button" value="{{ notice.id }}">Zatwierdź</button>
+                    </div>
+                </form>
+                <br><br>
+                {% endif %}
             {% endif %}
-
         {% endfor %}
     {% else %}
         <article class="media content-section">
