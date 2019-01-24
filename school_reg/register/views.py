@@ -6,9 +6,10 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, UpdateView
 
-from .forms import AddGradeForm, PresenceForm, AddAdvertForm, AddNoticeForm, AnswerNoticeForm
+from .forms import AddGradeForm, PresenceForm, AddAdvertForm, AddNoticeForm, AnswerNoticeForm, AddClassAdvertForm, \
+    EditAdvertForm, EditClassAdvertForm
 from .models import Classes, Subject, Student, GradeCategory, Teacher, PresenceList, WorkingHours, Schedule, WEEKDAYS, \
-    ClassRoom, Adverts, Parent, Notice
+    ClassRoom, Adverts, Parent, Notice, AdvertsClass
 from django.contrib import messages
 
 weekdays = [
@@ -109,9 +110,10 @@ class EditClassView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
 class DetailsClassView(View):
 
     def get(self, request, pk):
+        adverts = AdvertsClass.objects.filter(classes_id=pk)
         detail_class = get_object_or_404(Classes, id=pk)
         students = detail_class.student_set.all()
-        ctx = {'students': students, 'detail_class': detail_class}
+        ctx = {'students': students, 'detail_class': detail_class, 'adverts': adverts}
         return render(request, 'register/detail_classes.html', ctx)
 
 
@@ -335,6 +337,63 @@ class AdvertAddView(View):
         return render(request, 'register/add_advert.html', {'form': form})
 
 
+class AdvertEditView(View):
+    class_form = EditAdvertForm
+
+    def get(self, request, id_advert):
+        advert_class = get_object_or_404(Adverts, id=id_advert)
+        form = self.class_form(instance=advert_class)
+        return render(request, 'register/add_advert.html', {'form': form, 'advert_class': advert_class})
+
+    def post(self, request, id_advert):
+        advert_class = get_object_or_404(Adverts, id=id_advert)
+        form = self.class_form(request.POST, instance=advert_class)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Zmodyfikowano ogloszenie')
+            return redirect('main')
+        return render(request, 'register/add_advert.html', {'form': form})
+
+
+class AdvertClassAddView(View):
+    class_form = AddClassAdvertForm
+
+    def get(self, request, id_class):
+        student_class = get_object_or_404(Classes, id=id_class)
+        form = self.class_form()
+        return render(request, 'register/add_advert.html', {'form': form, 'student_class': student_class})
+
+    def post(self, request, id_class):
+        student_class = get_object_or_404(Classes, id=id_class)
+        form = self.class_form(request.POST)
+        if form.is_valid():
+            new_advert = form.save(commit=False)
+            new_advert.author = request.user.teacher
+            new_advert.classes = student_class
+            new_advert.save()
+            messages.success(request, 'Dodano ogloszenie')
+            return redirect('class-details', pk=id_class)
+        return render(request, 'register/add_advert.html', {'form': form, 'student_class': student_class})
+
+
+class AdvertClassEditView(View):
+    class_form = EditClassAdvertForm
+
+    def get(self, request, id_advert):
+        advert_class = get_object_or_404(AdvertsClass, id=id_advert)
+        form = self.class_form(instance=advert_class)
+        return render(request, 'register/add_advert.html', {'form': form, 'advert_class': advert_class})
+
+    def post(self, request, id_advert):
+        advert_class = get_object_or_404(AdvertsClass, id=id_advert)
+        form = self.class_form(request.POST, instance=advert_class)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Zmieniono ogloszenie')
+            return redirect('adverts-teacher')
+        return render(request, 'register/add_advert.html', {'form': form, 'advert_class': advert_class})
+
+
 class NoticeAddView(View):
     class_form = AddNoticeForm
 
@@ -379,10 +438,15 @@ class NoticeParentView(View):
 
 
 class NoticeTeacherView(View):
-
     def get(self, request):
         teacher = Teacher.objects.get(id=request.user.teacher.id)
         notices = teacher.notice_set.all()
         return render(request, 'register/notices_teacher.html', {'teacher': teacher, 'notices': notices})
 
 
+class AdvertTeacherView(View):
+    def get(self, request):
+        adverts_global = Adverts.objects.all()
+        adverts_class = AdvertsClass.objects.all()
+        ctx = {'adverts_global': adverts_global, 'adverts_class': adverts_class}
+        return render(request, 'register/advert_teacher.html', ctx)

@@ -4,7 +4,11 @@
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <fieldset class="form-group">
+            {% if advert_class %}
+            <label class="border-bottom mb-4">Modyfikuj ogloszenie</label>
+            {% else %}
             <label class="border-bottom mb-4">Dodaj Ogoszenie</label>
+            {% endif %}
             {{ form|crispy }}
         </fieldset>
         <div class="form-group">

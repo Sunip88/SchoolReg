@@ -130,10 +130,19 @@ class Adverts(models.Model):
     deleted = models.BooleanField(default=False)
 
 
+class AdvertsClass(models.Model):
+    text = models.TextField()
+    title = models.CharField(max_length=64)
+    date = models.DateField(auto_now_add=True)
+    author = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    deleted = models.BooleanField(default=False)
+    classes = models.ForeignKey(Classes, on_delete=models.CASCADE)
+
+
 class Notice(models.Model):
     text = models.CharField(max_length=256)
     from_user = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     to_user = models.ForeignKey(Student, on_delete=models.CASCADE)
     accepted = models.NullBooleanField()
     re_text = models.CharField(max_length=256)
-    # date
+    date = models.DateField(auto_now_add=True)

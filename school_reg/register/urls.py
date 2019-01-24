@@ -3,7 +3,7 @@ from .views import MainView, ClassView, AddClassView, EditClassView, DetailsClas
     EditSubjectView, AddGradesClass, AddGradeCategoryView, StudentDetailView, TeacherPanelView, \
     TeacherSubjectsClassesView, TeacherGradesView, StudentView, PresenceView, PresenceEditView, ScheduleClasses, \
     ScheduleTeacherView, ScheduleRoomView, SchedulesView, AdvertAddView, NoticeAddView, ParentPanelView, \
-    NoticeParentView, NoticeTeacherView
+    NoticeParentView, NoticeTeacherView, AdvertClassAddView, AdvertTeacherView, AdvertClassEditView, AdvertEditView
 
 urlpatterns = [
     path("", MainView.as_view(), name="main"),
@@ -17,9 +17,13 @@ urlpatterns = [
     path("add_subject/", AddSubjectView.as_view(), name='subject-add'),
     path("add_grade_category/", AddGradeCategoryView.as_view(), name='add-grade-category'),
     path("add_advert/", AdvertAddView.as_view(), name='add-advert'),
+    path("edit_advert/<int:id_advert>/", AdvertEditView.as_view(), name='edit-advert'),
+    path("add_advert_class/<int:id_class>/", AdvertClassAddView.as_view(), name='add-advert-class'),
+    path("edit_advert_class/<int:id_advert>/", AdvertClassEditView.as_view(), name='edit-advert-class'),
     path("add_notice/<int:id_student>/", NoticeAddView.as_view(), name='add-notice'),
     path("notices/<int:id_student>/", NoticeParentView.as_view(), name='notices-parent'),
     path("teacher_notices/", NoticeTeacherView.as_view(), name='notices-teacher'),
+    path("teacher_adverts/", AdvertTeacherView.as_view(), name='adverts-teacher'),
     path("edit_class/<int:pk>/", EditClassView.as_view(), name='class-edit'),
     path("edit_subject/<int:pk>/", EditSubjectView.as_view(), name='subject-edit'),
     path("detailed_class/<int:pk>/", DetailsClassView.as_view(), name='class-details'),

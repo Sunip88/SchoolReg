@@ -8,6 +8,7 @@
           <div class="media-body">
             <div class="article-metadata">
                 <p class="mr-2">{{ notice.to_user.user.first_name }} {{ notice.to_user.user.last_name }}</p>
+                <small class="text-muted">{{ notice.date|date:"F d, Y" }} </small>
             </div>
                 <p class="article-content">{{ notice.text }}</p>
               {% if notice.accepted %}
@@ -15,7 +16,6 @@
                   <p>Zaakceptowano:</p>
                 <p class="article-content">{{ notice.re_text }}</p>
               {% endif %}
-{#              <small class="text-muted">{{ advert.date|date:"F d, Y" }} </small>#}
           </div><br>
             </article>
         {% endfor %}

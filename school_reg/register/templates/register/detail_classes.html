@@ -7,6 +7,7 @@
                     <h4>Opis: {{ detail_class.description }}</h4>
                     <h4>Wychowawca: {{ detail_class.educator }}</h4>
                     <h5><a href="{% url 'class-schedule' detail_class.id %}">Plan zajęć</a></h5>
+                    <h4><a href="{% url 'add-advert-class' detail_class.id %}">Dodanie ogloszenia</a></h4>
                 </div>
             </div>
             <article class="media content-section">
@@ -18,19 +19,29 @@
                                     <li><a href="{% url 'student-details' student.id %}">{{ student }}</a></li>
                                 {% endfor %}
                             </ol>
-{#                            <a class="mr-2" href="#">{{ classs }}</a>#}
-    {#                        {% if 'register' in perms %}#}
-    {#                            {% if 'register.change_clasess' in perms %}#}
-    {#                                <a class="small float-right" href="{% url 'class-edit' classs.id %}">modyfikuj</a>#}
-    {#                            {% endif %}#}
-    {#                        {% endif %}#}
                         </div>
               </div>
             </article>
         </div>
-{#    {% if 'register' in perms %}#}
-{#        {% if 'register.add_clasess' in perms %}#}
-{#            <h3><a class="btn btn-outline-info small" href="{% url 'class-add' %}">dodaj</a></h3>#}
-{#        {% endif %}#}
-{#    {% endif %}#}
+        {% if adverts %}
+        <h3>Ogloszenia:</h3><br>
+        {% for advert in adverts %}
+            <article class="media content-section">
+              <div class="media-body">
+                <div class="article-metadata">
+                    <p class="mr-2">{{ advert.author.first_name }} {{ advert.author.last_name }}
+                    {% if advert.author == request.user %}
+                        <a href="{% url 'edit-advert-class' advert.id %}" class="float-right">Modyfikuj</a>
+                    {% endif %}
+                    </p>
+                </div>
+                    <b><p class="article-title">{{ advert.title }}</p></b>
+                    <p class="article-content">{{ advert.text }}</p>
+                  <small class="text-muted">{{ advert.date|date:"F d, Y" }} </small>
+              </div>
+            </article>
+        {% endfor %}
+    {% else %}
+        <p>Brak ogloszen</p>
+    {% endif %}
 {% endblock content %}

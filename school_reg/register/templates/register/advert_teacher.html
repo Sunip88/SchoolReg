@@ -1,0 +1,50 @@
+{% extends "register/base.html" %}
+{% load crispy_forms_tags %}
+{% load register.extras %}
+{% block content %}
+    {% if adverts_global %}
+        <h3>Twoje ogloszenia globalne:</h3><br>
+        {% for advert_g in adverts_global %}
+            {% if not advert_g.deleted %}
+                <article class="media content-section">
+                  <div class="media-body">
+                    <div class="article-metadata">
+                        <p class="mr-2">{{ advert_g.author.first_name }} {{ advert_g.author.last_name }}
+                        <a href="{% url 'edit-advert' advert_g.id %}" class="float-right">Modyfikuj</a>
+                        </p>
+                    </div>
+                        <b><p class="article-title">{{ advert_g.title }}</p></b>
+                        <p class="article-content">{{ advert_g.text }}</p>
+                      <small class="text-muted">{{ advert_g.date|date:"F d, Y" }} </small>
+                  </div>
+                </article>
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        <p>Brak ogloszen globalnych</p>
+    {% endif %}
+
+    {% if adverts_class %}
+        <h3>Twoje ogloszenia klasowe:</h3><br>
+        {% for advert_c in adverts_class %}
+            {% if not advert_g.deleted %}
+            <article class="media content-section">
+              <div class="media-body">
+                <div class="article-metadata">
+                    <p class="mr-2">
+                        {{ advert_c.author.user.first_name }} {{ advert_c.author.user.last_name }} - {{ advert_c.classes.name }}
+                        <a href="{% url 'edit-advert-class' advert_c.id %}" class="float-right">Modyfikuj</a>
+                    </p>
+                </div>
+                    <b><p class="article-title">{{ advert_c.title }}</p></b>
+                    <p class="article-content">{{ advert_c.text }}</p>
+                  <small class="text-muted">{{ advert_c.date|date:"F d, Y" }} </small>
+              </div>
+            </article>
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        <p>Brak ogloszen</p>
+    {% endif %}
+
+{% endblock content %}

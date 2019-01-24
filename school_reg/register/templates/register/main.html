@@ -5,16 +5,22 @@
     {% if adverts %}
         <h3>Ogloszenia:</h3><br>
         {% for advert in adverts %}
+            {% if not advert.deleted %}
             <article class="media content-section">
               <div class="media-body">
                 <div class="article-metadata">
-                    <p class="mr-2">{{ advert.author.first_name }} {{ advert.author.last_name }}</p>
+                    <p class="mr-2">{{ advert.author.first_name }} {{ advert.author.last_name }}
+                    {% if advert.author == request.user %}
+                        <a href="#" class="float-right">Modyfikuj</a>
+                    {% endif %}
+                    </p>
                 </div>
                     <b><p class="article-title">{{ advert.title }}</p></b>
                     <p class="article-content">{{ advert.text }}</p>
                   <small class="text-muted">{{ advert.date|date:"F d, Y" }} </small>
               </div>
             </article>
+            {% endif %}
         {% endfor %}
     {% else %}
         <p>Brak ogloszen</p>
