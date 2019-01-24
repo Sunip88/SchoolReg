@@ -1,12 +1,16 @@
 {% extends "register/base.html" %}
 {% load crispy_forms_tags %}
 {% block content %}
-    Napisz uwage dla:
-    {{ student.user.first_name }} {{ student.user.last_name }}
+    {% if notice %}
+        Edytuj uwage dla:
+        {{ notice.to_user.user.first_name }} {{ notice.to_user.user.last_name }}
+    {% else %}
+        Napisz uwage dla:
+        {{ student.user.first_name }} {{ student.user.last_name }}
+    {% endif %}
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <fieldset class="form-group">
-            <label class="border-bottom mb-4">Dodaj Uwage</label>
             {{ form|crispy }}
         </fieldset>
         <div class="form-group">

@@ -146,3 +146,4 @@ class Notice(models.Model):
     accepted = models.NullBooleanField()
     re_text = models.CharField(max_length=256)
     date = models.DateField(auto_now_add=True)
+    deleted = models.BooleanField(default=False)

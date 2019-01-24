@@ -7,7 +7,7 @@ from django.views import View
 from django.views.generic import CreateView, UpdateView
 
 from .forms import AddGradeForm, PresenceForm, AddAdvertForm, AddNoticeForm, AnswerNoticeForm, AddClassAdvertForm, \
-    EditAdvertForm, EditClassAdvertForm
+    EditAdvertForm, EditClassAdvertForm, EditNoticeForm
 from .models import Classes, Subject, Student, GradeCategory, Teacher, PresenceList, WorkingHours, Schedule, WEEKDAYS, \
     ClassRoom, Adverts, Parent, Notice, AdvertsClass
 from django.contrib import messages
@@ -415,6 +415,24 @@ class NoticeAddView(View):
         return render(request, 'register/add_notice.html', {'form': form, 'student': student})
 
 
+class NoticeEditView(View):
+    class_form = EditNoticeForm
+
+    def get(self, request, id_notice):
+        notice = get_object_or_404(Notice, id=id_notice)
+        form = self.class_form(instance=notice)
+        return render(request, 'register/add_notice.html', {'form': form, 'notice': notice})
+
+    def post(self, request, id_notice):
+        notice = get_object_or_404(Notice, id=id_notice)
+        form = self.class_form(request.POST, instance=notice)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Zmieniono uwage')
+            return redirect('notices-teacher')
+        return render(request, 'register/add_notice.html', {'form': form, 'notice': notice})
+
+
 class NoticeParentView(View):
     class_form = AnswerNoticeForm
 
@@ -433,8 +451,26 @@ class NoticeParentView(View):
         if form.is_valid():
             form.save()
             messages.success(request, 'Potwierdzono uwage')
-            return redirect('notices', id_student=id_student)
+            return redirect('notices-parent', id_student=id_student)
         return render(request, 'register/notice_parent.html', {'student': student, 'notices': notices, 'form': form})
+
+
+class NoticeParentEditView(View):
+    class_form = AnswerNoticeForm
+
+    def get(self, request, id_notice):
+        notice = get_object_or_404(Notice, id=id_notice)
+        form = self.class_form(instance=notice)
+        return render(request, 'register/add_notice.html', {'form': form, 'notice': notice})
+
+    def post(self, request, id_notice):
+        notice = get_object_or_404(Notice, id=id_notice)
+        form = self.class_form(request.POST, instance=notice)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Zmieniono uwage')
+            return redirect('notices-parent', id_student=notice.to_user.id)
+        return render(request, 'register/add_notice.html', {'form': form, 'notice': notice})
 
 
 class NoticeTeacherView(View):
