@@ -36,7 +36,9 @@
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
                 {% if user.is_authenticated %}
-                    <a class="nav-item nav-link" href="{% url 'announcements' %}">Powiadomienia</a>
+                    {% if user.profile.role == 1 %}
+                        <a class="nav-item nav-link" href="{% url 'announcements' %}">Powiadomienia</a>
+                    {% endif %}
                     <a class="nav-item nav-link" href="{% url 'profile' %}">Konto ({{ user.username }})</a>
                     <a class="nav-item nav-link" href="{% url 'logout' %}">Logout</a>
                 {% else %}

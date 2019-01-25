@@ -359,7 +359,7 @@ class ScheduleRoomView(LoginRequiredMixin, View):
         return render(request, 'register/schedule_class.html', ctx)
 
 
-class AdvertAddView(LoginRequiredMixin, View):
+class AdvertAddView(LoginRequiredMixin, UserPassesTestMixin, View):
     class_form = AddAdvertForm
 
     def get(self, request):
@@ -376,8 +376,14 @@ class AdvertAddView(LoginRequiredMixin, View):
             return redirect('main')
         return render(request, 'register/add_advert.html', {'form': form})
 
+    def test_func(self):
+        user = self.request.user
+        if user.profile.role == 2:
+            return True
+        return False
 
-class AdvertEditView(LoginRequiredMixin, View):
+
+class AdvertEditView(LoginRequiredMixin, UserPassesTestMixin, View):
     class_form = EditAdvertForm
 
     def get(self, request, id_advert):
@@ -393,6 +399,12 @@ class AdvertEditView(LoginRequiredMixin, View):
             messages.success(request, 'Zmodyfikowano ogloszenie')
             return redirect('main')
         return render(request, 'register/add_advert.html', {'form': form})
+
+    def test_func(self):
+        user = self.request.user
+        if user.profile.role == 2:
+            return True
+        return False
 
 
 class AdvertClassAddView(LoginRequiredMixin, View):
@@ -434,7 +446,7 @@ class AdvertClassEditView(LoginRequiredMixin, View):
         return render(request, 'register/add_advert.html', {'form': form, 'advert_class': advert_class})
 
 
-class NoticeAddView(LoginRequiredMixin, View):
+class NoticeAddView(LoginRequiredMixin, UserPassesTestMixin, View):
     class_form = AddNoticeForm
 
     def get(self, request, id_student):
@@ -454,8 +466,14 @@ class NoticeAddView(LoginRequiredMixin, View):
             return redirect('student-details', pk=id_student)
         return render(request, 'register/add_notice.html', {'form': form, 'student': student})
 
+    def test_func(self):
+        user = self.request.user
+        if user.profile.role == 2:
+            return True
+        return False
 
-class NoticeEditView(LoginRequiredMixin, View):
+
+class NoticeEditView(LoginRequiredMixin, UserPassesTestMixin, View):
     class_form = EditNoticeForm
 
     def get(self, request, id_notice):
@@ -472,8 +490,14 @@ class NoticeEditView(LoginRequiredMixin, View):
             return redirect('notices-teacher')
         return render(request, 'register/add_notice.html', {'form': form, 'notice': notice})
 
+    def test_func(self):
+        user = self.request.user
+        if user.profile.role == 2:
+            return True
+        return False
 
-class NoticeParentView(LoginRequiredMixin, View):
+
+class NoticeParentView(LoginRequiredMixin, UserPassesTestMixin, View):
     class_form = AnswerNoticeForm
 
     def get(self, request, id_student):
@@ -494,8 +518,14 @@ class NoticeParentView(LoginRequiredMixin, View):
             return redirect('notices-parent', id_student=id_student)
         return render(request, 'register/notice_parent.html', {'student': student, 'notices': notices, 'form': form})
 
+    def test_func(self):
+        user = self.request.user
+        if user.profile.role == 1:
+            return True
+        return False
 
-class NoticeParentEditView(LoginRequiredMixin, View):
+
+class NoticeParentEditView(LoginRequiredMixin, UserPassesTestMixin, View):
     class_form = AnswerNoticeForm
 
     def get(self, request, id_notice):
@@ -512,23 +542,41 @@ class NoticeParentEditView(LoginRequiredMixin, View):
             return redirect('notices-parent', id_student=notice.to_user.id)
         return render(request, 'register/add_notice.html', {'form': form, 'notice': notice})
 
+    def test_func(self):
+        user = self.request.user
+        if user.profile.role == 1:
+            return True
+        return False
 
-class NoticeTeacherView(LoginRequiredMixin, View):
+
+class NoticeTeacherView(LoginRequiredMixin, UserPassesTestMixin, View):
     def get(self, request):
         teacher = Teacher.objects.get(id=request.user.teacher.id)
         notices = teacher.notice_set.all()
         return render(request, 'register/notices_teacher.html', {'teacher': teacher, 'notices': notices})
 
+    def test_func(self):
+        user = self.request.user
+        if user.profile.role == 2:
+            return True
+        return False
 
-class AdvertTeacherView(LoginRequiredMixin, View):
+
+class AdvertTeacherView(LoginRequiredMixin, UserPassesTestMixin, View):
     def get(self, request):
         adverts_global = Adverts.objects.all()
         adverts_class = AdvertsClass.objects.all()
         ctx = {'adverts_global': adverts_global, 'adverts_class': adverts_class}
         return render(request, 'register/advert_teacher.html', ctx)
 
+    def test_func(self):
+        user = self.request.user
+        if user.profile.role == 2:
+            return True
+        return False
 
-class AnnouncementView(LoginRequiredMixin, View):
+
+class AnnouncementView(LoginRequiredMixin, UserPassesTestMixin, View):
 
     def get(self, request):
         if request.user.profile.role == 1:
@@ -542,3 +590,9 @@ class AnnouncementView(LoginRequiredMixin, View):
         # object_list = Announcements.objects.filter(user=request.user)
         ctx = {'children': children, 'children_flag': children_flag}
         return render(request, 'register/announcements_list.html', ctx)
+
+    def test_func(self):
+        user = self.request.user
+        if user.profile.role == 1:
+            return True
+        return False

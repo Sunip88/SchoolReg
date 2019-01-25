@@ -11,7 +11,7 @@
                 <div class="article-metadata">
                     <p class="mr-2">{{ advert.author.first_name }} {{ advert.author.last_name }}
                     {% if advert.author == request.user %}
-                        <a href="#" class="float-right">Modyfikuj</a>
+                        <a href="{% url 'edit-advert' advert.id %}" class="float-right">Modyfikuj</a>
                     {% endif %}
                     </p>
                 </div>
