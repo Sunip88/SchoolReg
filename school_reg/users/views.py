@@ -137,6 +137,7 @@ class ProfileView(LoginRequiredMixin, View):
         role = request.user.profile.role
         if role == 0:
             s_form = StudentRegisterForm(instance=request.user.student)
+            # user = Student.objects.get(user_id=request.user.id)
         return render(request, 'users/profile.html', locals())
 
     def post(self, request):

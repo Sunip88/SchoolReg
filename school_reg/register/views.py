@@ -103,23 +103,24 @@ class StudentView(LoginRequiredMixin, UserPassesTestMixin, View):
 
     def test_func(self):
         user = self.request.user
-        if user.profile.role == 1:
+        if user.profile.role == 0:
             return True
         return False
 
 
-class ClassView(LoginRequiredMixin, View):
+class ClassView(LoginRequiredMixin, UserPassesTestMixin, View):
     def get(self, request):
-        teacher = Teacher.objects.filter(user_id=request.user.id)
-        if teacher:
-            classes = teacher.classes_set.all()
-        else:
-            messages.success(request, 'Konto admin')
-            classes = Classes.objects.all()
+        classes = Classes.objects.all()
         return render(request, 'register/classes.html', {'classes': classes})
 
+    def test_func(self):
+        user = self.request.user
+        if user.profile.role == 2:
+            return True
+        return False
 
-class AddClassView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+
+class AddClassView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):  # delete?
     permission_required = 'register.add_classes'
     model = Classes
     fields = '__all__'
@@ -127,7 +128,7 @@ class AddClassView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     success_url = reverse_lazy("class-view")
 
 
-class EditClassView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+class EditClassView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):  # delete?
     permission_required = 'register.change_classes'
     model = Classes
     fields = '__all__'
@@ -140,14 +141,35 @@ class DetailsClassView(LoginRequiredMixin, View):
         adverts = AdvertsClass.objects.filter(classes_id=pk)
         detail_class = get_object_or_404(Classes, id=pk)
         students = detail_class.student_set.all()
+        if not self.my_test(detail_class):
+            raise PermissionDenied
         ctx = {'students': students, 'detail_class': detail_class, 'adverts': adverts}
         return render(request, 'register/detail_classes.html', ctx)
+
+    def my_test(self, detail_class):
+        user = self.request.user
+        role = user.profile.role
+        if role == 2:
+            return True
+        elif role == 0:
+            if user.student in detail_class.student_set.all():
+                return True
+            else:
+                return False
+        else:
+            children = user.parent.students.all()
+            if children:
+                for child in children:
+                    if child in detail_class.student_set.all():
+                        return True
+            return False
 
 
 class SubjectsView(LoginRequiredMixin, View):
     def get(self, request):
         subjects = Subject.objects.all()
         return render(request, 'register/subjects.html', {'subjects': subjects})
+#TODO decide
 
 
 class AddSubjectView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
