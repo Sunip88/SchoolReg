@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import MainView, ClassView, AddClassView, EditClassView, DetailsClassView, SubjectsView, AddSubjectView, \
     EditSubjectView, AddGradesClass, AddGradeCategoryView, StudentDetailView, TeacherPanelView, \
-    TeacherSubjectsClassesView, TeacherGradesView, StudentView, PresenceView, PresenceEditView, ScheduleClasses, \
+    TeacherSubjectsClassesView, TeacherGradesView, StudentView, PresenceView, ScheduleClasses, \
     ScheduleTeacherView, ScheduleRoomView, SchedulesView, AdvertAddView, NoticeAddView, ParentPanelView, \
     NoticeParentView, NoticeTeacherView, AdvertClassAddView, AdvertTeacherView, AdvertClassEditView, AdvertEditView, \
     NoticeEditView, NoticeParentEditView, AnnouncementView
@@ -39,5 +39,4 @@ urlpatterns = [
     path("detailed_student/<int:pk>/", StudentDetailView.as_view(), name='student-details'),
     path("add_grades/<int:id_class>/<int:id_subject>/", AddGradesClass.as_view(), name='class-grade-add'),
     path("add_presence/<int:id_class>/<int:id_subject>/", PresenceView.as_view(), name='class-presence-add'),
-    path("edit_presence/<int:id_class>/<int:id_subject>/<int:id_student>/", PresenceEditView.as_view(), name='class-presence-edit'),
 ]

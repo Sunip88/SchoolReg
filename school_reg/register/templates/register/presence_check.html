@@ -16,28 +16,30 @@
             </div>
             <article class="media content-section">
               <div class="media-body">
+                <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
                         <div class="article-metadata">
-                            <ol>
+                            <table class="table">
+                            <tr>
+                                <th>Nr</th>
+                                <th>Uczen</th>
+                                <th><input id="check_all" type="checkbox" name="all"> Obecnosc</th>
+                            </tr>
                                 {% for student in students %}
-                                    <li>
-                                    {% if student|student_presence:subject %}
-                                    <form method="post" enctype="multipart/form-data">
-                                        {% csrf_token %}
-                                        <a href="{% url 'student-details' student.id %}">{{ student }}</a> {{ form }}
-                                    <button class="btn btn-outline-info" type="submit" name="button" value="{{ student.id }}">Dodaj</button>
-                                    </form>
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td><a href="{% url 'student-details' student.id %}">{{ student }}</a></td>
+                                    {% if not student|student_presence_get:subject %}
+                                        <td><input type="checkbox" name="student" value="{{ student.id }}"></td>
                                     {% else %}
-                                        <a href="{% url 'student-details' student.id %}">{{ student }}</a>
-                                        - {{ student|student_presence_get:subject }}
-                                        <a href="{% url 'class-presence-edit' detail_class.id subject.id student.id %}">
-                                            Edytuj obecność
-                                        </a>
+                                        <td><input type="checkbox" name="student" value="{{ student.id }}" checked></td>
                                     {% endif %}
-                                    </li>
+                                    </tr>
                                 {% endfor %}
-
-                            </ol>
+                            </table>
                         </div>
+                <button class="btn btn-outline-info" type="submit" name="button">Zatwierdz</button>
+                </form>
               </div>
             </article>
         </div>

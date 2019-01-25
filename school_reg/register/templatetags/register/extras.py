@@ -46,7 +46,9 @@ def student_presence_get(student, subject):
     presence = student.presencelist_set.filter(subject_id=subject.id, day=today)
     if presence:
         presence = presence.first()
-    return presence.present
+        return presence.present
+    else:
+        return False
 
 
 @register.simple_tag

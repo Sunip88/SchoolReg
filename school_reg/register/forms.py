@@ -1,17 +1,11 @@
 from django import forms
-from .models import Student, Parent, Classes, Grades, PresenceList, Adverts, Notice, AdvertsClass
+from .models import Grades, Adverts, Notice, AdvertsClass
 
 
 class AddGradeForm(forms.ModelForm):
     class Meta:
         model = Grades
         fields = ['category', 'grade']
-
-
-class PresenceForm(forms.ModelForm):
-    class Meta:
-        model = PresenceList
-        fields = ['present']
 
 
 class AddAdvertForm(forms.ModelForm):

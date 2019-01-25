@@ -1,12 +1,11 @@
-from datetime import datetime, date
-
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from datetime import datetime
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import CreateView, UpdateView, ListView
-
-from .forms import AddGradeForm, PresenceForm, AddAdvertForm, AddNoticeForm, AnswerNoticeForm, AddClassAdvertForm, \
+from django.views.generic import CreateView, UpdateView
+from .forms import AddGradeForm, AddAdvertForm, AddNoticeForm, AnswerNoticeForm, AddClassAdvertForm, \
     EditAdvertForm, EditClassAdvertForm, EditNoticeForm
 from .models import Classes, Subject, Student, GradeCategory, Teacher, PresenceList, WorkingHours, Schedule, WEEKDAYS, \
     ClassRoom, Adverts, Parent, Notice, AdvertsClass, Announcements
@@ -24,13 +23,12 @@ weekdays = [
 
 
 class MainView(LoginRequiredMixin, View):
-
     def get(self, request):
         adverts = Adverts.objects.all()
         return render(request, 'register/main.html', {'adverts': adverts})
 
 
-class TeacherPanelView(LoginRequiredMixin, View):
+class TeacherPanelView(LoginRequiredMixin, UserPassesTestMixin, View):
     def get(self, request):
         teacher = Teacher.objects.get(user_id=self.request.user.id)
         educator = teacher.classes_set.all()
@@ -38,16 +36,28 @@ class TeacherPanelView(LoginRequiredMixin, View):
             educator = educator.first()
         return render(request, 'register/teacher_view.html', {"teacher": teacher, "educator": educator})
 
+    def test_func(self):
+        user = self.request.user
+        if user.profile.role == 2:
+            return True
+        return False
 
-class ParentPanelView(LoginRequiredMixin, View):
+
+class ParentPanelView(LoginRequiredMixin, UserPassesTestMixin, View):
     def get(self, request):
         parent = Parent.objects.get(user_id=self.request.user.id)
         children = parent.students.all()
         ctx = {"parent": parent, "children": children}
         return render(request, 'register/parent_view.html', ctx)
 
+    def test_func(self):
+        user = self.request.user
+        if user.profile.role == 1:
+            return True
+        return False
 
-class TeacherSubjectsClassesView(LoginRequiredMixin, View):
+
+class TeacherSubjectsClassesView(LoginRequiredMixin, UserPassesTestMixin, View):
     def get(self, request):
         teacher = Teacher.objects.filter(user_id=request.user.id)
         if teacher:
@@ -57,8 +67,14 @@ class TeacherSubjectsClassesView(LoginRequiredMixin, View):
             subjects = []
         return render(request, 'register/teacher_class_subject.html', {'teacher': teacher, 'subjects': subjects})
 
+    def test_func(self):
+        user = self.request.user
+        if user.profile.role == 2:
+            return True
+        return False
 
-class TeacherGradesView(LoginRequiredMixin, View):
+
+class TeacherGradesView(LoginRequiredMixin, UserPassesTestMixin, View):
     def get(self, request, subject_id, class_id):
         subject = get_object_or_404(Subject, id=subject_id)
         student_class = get_object_or_404(Classes, id=class_id)
@@ -71,13 +87,25 @@ class TeacherGradesView(LoginRequiredMixin, View):
                'class_id': class_id}
         return render(request, 'register/teacher_class_grades.html', ctx)
 
+    def test_func(self):
+        user = self.request.user
+        if user.profile.role == 2:
+            return True
+        return False
 
-class StudentView(LoginRequiredMixin, View):
+
+class StudentView(LoginRequiredMixin, UserPassesTestMixin, View):
     def get(self, request):
         student = Student.objects.get(user_id=self.request.user.id)
         student_class = student.classes
         ctx = {'student': student, 'student_class': student_class}
         return render(request, 'register/student_view.html', ctx)
+
+    def test_func(self):
+        user = self.request.user
+        if user.profile.role == 1:
+            return True
+        return False
 
 
 class ClassView(LoginRequiredMixin, View):
@@ -108,7 +136,6 @@ class EditClassView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
 
 
 class DetailsClassView(LoginRequiredMixin, View):
-
     def get(self, request, pk):
         adverts = AdvertsClass.objects.filter(classes_id=pk)
         detail_class = get_object_or_404(Classes, id=pk)
@@ -118,7 +145,6 @@ class DetailsClassView(LoginRequiredMixin, View):
 
 
 class SubjectsView(LoginRequiredMixin, View):
-
     def get(self, request):
         subjects = Subject.objects.all()
         return render(request, 'register/subjects.html', {'subjects': subjects})
@@ -201,71 +227,59 @@ class StudentDetailView(LoginRequiredMixin, View):
 
 
 class PresenceView(LoginRequiredMixin, View):
-    class_form = PresenceForm
 
     def get(self, request, id_class, id_subject):
         detail_class = get_object_or_404(Classes, id=id_class)
         students = Student.objects.filter(classes_id=detail_class.id)
         subject = get_object_or_404(Subject, id=id_subject)
         today = datetime.now().strftime('%Y-%m-%d')
-        form = self.class_form()
-        ctx = {'detail_class': detail_class, 'students': students, 'subject': subject, 'form': form, 'today': today}
+        ctx = {'detail_class': detail_class, 'students': students, 'subject': subject, 'today': today}
         return render(request, 'register/presence_check.html', ctx)
 
     def post(self, request, id_class, id_subject):
-        form = self.class_form(request.POST)
         detail_class = get_object_or_404(Classes, id=id_class)
         students = Student.objects.filter(classes_id=detail_class.id)
         subject = get_object_or_404(Subject, id=id_subject)
-        today = datetime.now().date()
-        ctx = {'detail_class': detail_class, 'students': students, 'subject': subject, 'form': form}
-        if form.is_valid():
-            button = request.POST.get('button')
-            student = get_object_or_404(Student, id=button)
-            presence = form.save(commit=False)
-            presence.day = today
-            presence.student = student
-            presence.subject = subject
-            presence.save()
-            messages.success(request, 'Dodano ocenę')
-            return redirect('class-presence-add', id_class=id_class, id_subject=id_subject)
-        return render(request, 'register/presence_check.html', ctx)
+        today = datetime.now()
+        date_formated = today.strftime('%Y-%m-%d')
+        day = today.date()
+        student_presence_str = request.POST.getlist('student')
+        student_presence = [int(i) for i in student_presence_str]
+        for student in students:
+            presence = PresenceList.objects.filter(student=student,
+                                                   day=day,
+                                                   subject=subject)
+            if student.id in student_presence:
+                if len(presence) > 0:
+                    presence = presence.first()
+                    presence.present = True
+                    presence.save()
+                else:
+                    PresenceList.objects.create(student=student,
+                                                day=day,
+                                                subject=subject,
+                                                present=True)
+            else:
+                name = student.user.first_name
+                surname = student.user.last_name
+                text = f"{name} {surname} był nieobecny na {subject} w dniu {date_formated}"
+                if len(presence) > 0:
+                    presence = presence.first()
+                    if presence.present:
+                        Announcements.objects.create(text=text,
+                                                     user=student.user)
+                    presence.present = False
+                    presence.save()
+                else:
+                    PresenceList.objects.create(student=student,
+                                                day=day,
+                                                subject=subject,
+                                                present=False)
+                    Announcements.objects.create(text=text,
+                                                 user=student.user)
 
-
-class PresenceEditView(LoginRequiredMixin, View):
-    class_form = PresenceForm
-
-    def get(self, request, id_class, id_subject, id_student):
-        detail_class = get_object_or_404(Classes, id=id_class)
-        student = get_object_or_404(Student, id=id_student)
-        subject = get_object_or_404(Subject, id=id_subject)
-        today = datetime.now().date()
-        today_str = today.strftime('%Y-%m-%d')
-        presence = PresenceList.objects.filter(student_id=student.id, day=today, subject_id=subject.id).first()
-        form = self.class_form(instance=presence)
-        ctx = {'detail_class': detail_class, 'student': student, 'subject': subject, 'form': form, 'today': today_str}
-        return render(request, 'register/presence_edit.html', ctx)
-
-    def post(self, request, id_class, id_subject, id_student):
-        detail_class = get_object_or_404(Classes, id=id_class)
-        student = get_object_or_404(Student, id=id_student)
-        subject = get_object_or_404(Subject, id=id_subject)
-        today = datetime.now().date()
-        today_str = today.strftime('%Y-%m-%d')
-        presence = PresenceList.objects.filter(student_id=student.id, day=today, subject_id=subject.id).first()
-        form = self.class_form(request.POST, instance=presence)
-        ctx = {'detail_class': detail_class, 'student': student, 'subject': subject, 'form': form, 'today': today_str}
-        if form.is_valid():
-            button = request.POST.get('button')
-            student = get_object_or_404(Student, id=button)
-            presence = form.save(commit=False)
-            presence.day = today
-            presence.student = student
-            presence.subject = subject
-            presence.save()
-            messages.success(request, 'Dodano ocenę')
-            return redirect('class-presence-add', id_class=id_class, id_subject=id_subject)
-        return render(request, 'register/presence_edit.html', ctx)
+        messages.success(request, 'Zaktualizowano obecności')
+        return redirect('class-presence-add', id_class=id_class, id_subject=id_subject)
 
 
 class SchedulesView(LoginRequiredMixin, View):
@@ -506,5 +520,3 @@ class AnnouncementView(LoginRequiredMixin, View):
         # object_list = Announcements.objects.filter(user=request.user)
         ctx = {'children': children, 'children_flag': children_flag}
         return render(request, 'register/announcements_list.html', ctx)
-
-

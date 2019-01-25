@@ -25,7 +25,8 @@ class LogoutUserView(auth_views.LogoutView):
     template_name = 'users/logout.html'
 
 
-class RegisterChoiceView(LoginRequiredMixin, View):
+class RegisterChoiceView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = 'add_user'
 
     def get(self, request):
         return render(request, 'users/register_choice.html')
@@ -40,7 +41,8 @@ class RegisterChoiceView(LoginRequiredMixin, View):
             return redirect('register-parent')
 
 
-class RegisterTeacherView(LoginRequiredMixin, View):
+class RegisterTeacherView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = 'add_user'
     form_class = UserTeacherRegisterForm
 
     def get(self, request):
@@ -60,7 +62,8 @@ class RegisterTeacherView(LoginRequiredMixin, View):
         return render(request, "users/register.html", {"form": form})
 
 
-class RegisterParentView(LoginRequiredMixin, View):
+class RegisterParentView(LoginRequiredMixin, PermissionRequiredMixin,  View):
+    permission_required = 'add_user'
     form_class_u = UserParentStudentRegisterForm
     form_class_p = ParentRegisterForm
 
@@ -92,10 +95,10 @@ class RegisterParentView(LoginRequiredMixin, View):
         return render(request, "users/register.html", {'form': form, 'form_p': form_p})
 
 
-class RegisterStudentsView(LoginRequiredMixin, View):
+class RegisterStudentsView(LoginRequiredMixin, PermissionRequiredMixin,  View):
+    permission_required = 'add_user'
     form_class_u = UserParentStudentRegisterForm
     form_class_s = StudentRegisterForm
-    # StudentFormset = modelformset_factory(User, fields=('first_name', 'last_name'), extra=1) maybe later
 
     def get(self, request):
         form = self.form_class_u()
