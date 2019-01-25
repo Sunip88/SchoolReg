@@ -178,7 +178,10 @@ class AddGradesClass(LoginRequiredMixin, View):
             new_grade.subject = subject
             new_grade.student = student
             new_grade.save()
-
+            name = student.user.first_name
+            surname = student.user.last_name
+            text = f'''Uczen {name} {surname} otrzymal {new_grade.grade} z {new_grade.subject}.'''
+            Announcements.objects.create(text=text, user=student.user)
             messages.success(request, 'Dodano ocenę')
             return redirect('class-grade-add', id_class=id_class, id_subject=id_subject)
         return render(request, 'register/detail_classes_add_grade.html', ctx)
@@ -489,10 +492,19 @@ class AdvertTeacherView(LoginRequiredMixin, View):
         return render(request, 'register/advert_teacher.html', ctx)
 
 
-class AnnouncementView(View):
+class AnnouncementView(LoginRequiredMixin, View):
 
     def get(self, request):
-        object_list = Announcements.objects.filter(user=request.user)
-        return render(request, 'register/announcements_list.html', {'object_list': object_list})
+        if request.user.profile.role == 1:
+            parent = Parent.objects.get(user_id=request.user.id)
+            children = parent.students.all()
+            if len(children) > 1:
+                children_flag = True
+            else:
+                children_flag = False
+        #     object_list = Announcements.objects.filter(user=request.user.parent.students)
+        # object_list = Announcements.objects.filter(user=request.user)
+        ctx = {'children': children, 'children_flag': children_flag}
+        return render(request, 'register/announcements_list.html', ctx)
 
 

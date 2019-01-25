@@ -1,7 +1,6 @@
 #!/usr/bin/python3.7
 from django import template
-from register.models import Classes, Parent
-
+from register.models import Classes, Parent, Announcements
 
 register = template.Library()
 
@@ -23,3 +22,9 @@ def parent_students(user):
         return students
     else:
         return "Brak przypisanych uczniów"
+
+
+@register.simple_tag
+def announcements_for_child(child):
+    announcements = Announcements.objects.filter(user=child.user)
+    return announcements

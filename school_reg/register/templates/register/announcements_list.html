@@ -3,23 +3,28 @@
 
 {% block content %}
     <h3 class="mb-3">Powiadomienia</h3>
-
-    {% if object_list %}
-        {% for message in object_list %}
-            <article class="media content-section">
-              <div class="media-body">
-                <div class="article-metadata">
-                    <small class="text-muted">{{ message.date|date:"F d, Y" }} </small>
-                </div>
-              <a class="article-title" href="#">
-                {% if message.read == False %}
-                    <p class="article-content font-weight-bold">{{ message.text }}</p>
-                {% else %}
-                    <p class="article-content">{{ message.text }}</p>
-                {% endif %}
-              </a>
-              </div>
-            </article>
+    {% if children %}
+        {% for child in children %}
+            {% if children_flag %}
+            <h4>{{ child.user.first_name }} {{ child.user.last_name }}</h4>
+            {% endif %}
+            {% announcements_for_child child as announcements %}
+            {% for one in announcements %}
+                <article class="media content-section">
+                  <div class="media-body">
+                    <div class="article-metadata">
+                        <small class="text-muted">{{ one.date|date:"F d, Y" }} </small>
+                    </div>
+                  <a class="article-title" href="#">
+                    {% if one.read == False %}
+                        <p class="article-content font-weight-bold">{{ one.text }}</p>
+                    {% else %}
+                        <p class="article-content">{{ one.text }}</p>
+                    {% endif %}
+                  </a>
+                  </div>
+                </article>
+            {% endfor %}
         {% endfor %}
     {% else %}
         <h4 class="mb-3">Brak powiadomien</h4>
