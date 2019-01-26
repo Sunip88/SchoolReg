@@ -59,13 +59,21 @@ class ParentPanelView(LoginRequiredMixin, UserPassesTestMixin, View):
 
 class TeacherSubjectsClassesView(LoginRequiredMixin, UserPassesTestMixin, View):
     def get(self, request):
-        teacher = Teacher.objects.filter(user_id=request.user.id)
-        if teacher:
-            teacher = teacher.first()
-            subjects = teacher.subjects.all()
+        teacher = Teacher.objects.get(user_id=request.user.id)
+        schedule = Schedule.objects.filter(teacher=teacher)
+        subjects = []
+        temp = []
+        if schedule:
+            for item in schedule:
+                i = str(item.subject) + str(item.classes.name)
+                if i not in temp:
+                    subjects.append(item)
+                    temp.append(str(item.subject) + str(item.classes.name))
+            print(subjects)
         else:
             subjects = []
-        return render(request, 'register/teacher_class_subject.html', {'teacher': teacher, 'subjects': subjects})
+        ctx = {'teacher': teacher, 'subjects': subjects, 'schedule': schedule}
+        return render(request, 'register/teacher_class_subject.html', ctx)
 
     def test_func(self):
         user = self.request.user
@@ -202,13 +210,15 @@ class AddGradeCategoryView(LoginRequiredMixin, PermissionRequiredMixin, CreateVi
     success_url = reverse_lazy("add-grade-category")
 
 
-class AddGradesClass(LoginRequiredMixin, View):
+class AddGradesClass(LoginRequiredMixin, UserPassesTestMixin, View):
     class_form = AddGradeForm
 
     def get(self, request, id_class, id_subject):
         detail_class = get_object_or_404(Classes, id=id_class)
         students = Student.objects.filter(classes_id=detail_class.id)
         subject = get_object_or_404(Subject, id=id_subject)
+        if not self.my_test(subject, detail_class):
+            raise PermissionDenied
         form = self.class_form()
         ctx = {'detail_class': detail_class, 'students': students, 'subject': subject, 'form': form}
         return render(request, 'register/detail_classes_add_grade.html', ctx)
@@ -218,6 +228,8 @@ class AddGradesClass(LoginRequiredMixin, View):
         detail_class = get_object_or_404(Classes, id=id_class)
         students = Student.objects.filter(classes_id=detail_class.id)
         subject = get_object_or_404(Subject, id=id_subject)
+        if not self.my_test(subject, detail_class):
+            raise PermissionDenied
         ctx = {'detail_class': detail_class, 'students': students, 'subject': subject, 'form': form}
         if form.is_valid():
             button = request.POST.get('button')
@@ -234,11 +246,27 @@ class AddGradesClass(LoginRequiredMixin, View):
             return redirect('class-grade-add', id_class=id_class, id_subject=id_subject)
         return render(request, 'register/detail_classes_add_grade.html', ctx)
 
+    def test_func(self):
+        user = self.request.user
+        if user.profile.role == 2:
+            return True
+        return False
+
+    def my_test(self, subject, classes):
+        teacher = Schedule.objects.filter(classes=classes, subject=subject)
+        if teacher:
+            teacher = teacher.first().teacher
+            if self.request.user.teacher == teacher:
+                return True
+        return False
+
 
 class StudentDetailView(LoginRequiredMixin, View):
 
     def get(self, request, pk):
         student = get_object_or_404(Student, id=pk)
+        if not self.my_test(student):
+            raise PermissionDenied
         grades = student.grades_set.all()
         subjects = {}
         for g in grades:
@@ -247,13 +275,33 @@ class StudentDetailView(LoginRequiredMixin, View):
         ctx = {'student': student, 'grades': grades, 'subjects': subjects}
         return render(request, 'register/student_details.html', ctx)
 
+    def my_test(self, student):
+        user = self.request.user
+        role = user.profile.role
+        if role == 2:
+            return True
+        elif role == 0:
+            if user.student == student:
+                return True
+            else:
+                return False
+        else:
+            children = user.parent.students.all()
+            if children:
+                for child in children:
+                    if child == student:
+                        return True
+            return False
 
-class PresenceView(LoginRequiredMixin, View):
+
+class PresenceView(LoginRequiredMixin, UserPassesTestMixin, View):
 
     def get(self, request, id_class, id_subject):
         detail_class = get_object_or_404(Classes, id=id_class)
         students = Student.objects.filter(classes_id=detail_class.id)
         subject = get_object_or_404(Subject, id=id_subject)
+        if not self.my_test(subject, detail_class):
+            raise PermissionDenied
         today = datetime.now().strftime('%Y-%m-%d')
         ctx = {'detail_class': detail_class, 'students': students, 'subject': subject, 'today': today}
         return render(request, 'register/presence_check.html', ctx)
@@ -302,6 +350,20 @@ class PresenceView(LoginRequiredMixin, View):
 
         messages.success(request, 'Zaktualizowano obecności')
         return redirect('class-presence-add', id_class=id_class, id_subject=id_subject)
+
+    def test_func(self):
+        user = self.request.user
+        if user.profile.role == 2:
+            return True
+        return False
+
+    def my_test(self, subject, classes):
+        teacher = Schedule.objects.filter(classes=classes, subject=subject)
+        if teacher:
+            teacher = teacher.first().teacher
+            if self.request.user.teacher == teacher:
+                return True
+        return False
 
 
 class SchedulesView(LoginRequiredMixin, View):
@@ -407,7 +469,7 @@ class AdvertEditView(LoginRequiredMixin, UserPassesTestMixin, View):
         return False
 
 
-class AdvertClassAddView(LoginRequiredMixin, View):
+class AdvertClassAddView(LoginRequiredMixin, UserPassesTestMixin, View):
     class_form = AddClassAdvertForm
 
     def get(self, request, id_class):
@@ -427,8 +489,14 @@ class AdvertClassAddView(LoginRequiredMixin, View):
             return redirect('class-details', pk=id_class)
         return render(request, 'register/add_advert.html', {'form': form, 'student_class': student_class})
 
+    def test_func(self):
+        user = self.request.user
+        if user.profile.role == 2:
+            return True
+        return False
 
-class AdvertClassEditView(LoginRequiredMixin, View):
+
+class AdvertClassEditView(LoginRequiredMixin, UserPassesTestMixin, View):
     class_form = EditClassAdvertForm
 
     def get(self, request, id_advert):
@@ -444,6 +512,12 @@ class AdvertClassEditView(LoginRequiredMixin, View):
             messages.success(request, 'Zmieniono ogloszenie')
             return redirect('adverts-teacher')
         return render(request, 'register/add_advert.html', {'form': form, 'advert_class': advert_class})
+
+    def test_func(self):
+        user = self.request.user
+        if user.profile.role == 2:
+            return True
+        return False
 
 
 class NoticeAddView(LoginRequiredMixin, UserPassesTestMixin, View):

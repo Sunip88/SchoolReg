@@ -121,6 +121,9 @@ class Schedule(models.Model):
     hours = models.ForeignKey(WorkingHours, on_delete=models.CASCADE)
     weekday = models.IntegerField(choices=WEEKDAYS)
 
+    def __str__(self):
+        return f"{self.classes.name} - {self.subject.name} - {self.teacher.user.last_name} - {self.room}"
+
 
 class Adverts(models.Model):
     text = models.TextField()

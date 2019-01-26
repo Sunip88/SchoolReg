@@ -10,30 +10,43 @@
                         <th>Dodawanie ocen</th>
                         <th>Sprawdzanie obecnosci</th>
                     </tr>
-                {% for subject in subjects %}
-                    {% for class in subject.classes.all %}
+{#                {% for subject in subjects %}#}
+{#                    {% for class in subject.classes.all %}#}
+{#                    <tr>#}
+{#                        <td>#}
+{#                            <a class="mr-2" href="{% url 'class-details-grades' subject.id class.id %}">#}
+{#                                {{ subject.name }} {{ class.name }} - {{ class.educator }}#}
+{#                            </a>#}
+{#                        </td>#}
+{#                        <td>#}
+{#                            <a class="mr-2" href="{% url 'class-grade-add' class.id subject.id %}">Dodawanie Ocen</a>#}
+{#                        </td>#}
+{#                        <td>#}
+{#                            <a class="mr-2" href="{% url 'class-presence-add' class.id subject.id %}">#}
+{#                                Sprawdzenie obecności#}
+{#                            </a>#}
+{#                        </td>#}
+{#                    </tr>#}
+{#                    {% endfor %}#}
+{#                {% endfor %}#}
+                  {% for item in subjects %}
                     <tr>
                         <td>
-                            <a class="mr-2" href="{% url 'class-details-grades' subject.id class.id %}">
-                                {{ subject.name }} {{ class.name }} - {{ class.educator }}
+                            <a class="mr-2" href="{% url 'class-details-grades' item.subject.id item.classes.id %}">
+                                {{ item.subject.name }} {{ item.classes.name }} - {{ item.classes.educator }}
                             </a>
                         </td>
                         <td>
-                            <a class="mr-2" href="{% url 'class-grade-add' class.id subject.id %}">Dodawanie Ocen</a>
+                            <a class="mr-2" href="{% url 'class-grade-add' item.classes.id item.subject.id %}">Dodawanie Ocen</a>
                         </td>
                         <td>
-                            <a class="mr-2" href="{% url 'class-presence-add' class.id subject.id %}">
+                            <a class="mr-2" href="{% url 'class-presence-add' item.classes.id item.subject.id %}">
                                 Sprawdzenie obecności
                             </a>
                         </td>
                     </tr>
-                    {% endfor %}
-{#                        {% if 'register' in perms %}#}
-{#                            {% if 'register.change_clasess' in perms %}#}
-{#                                <a class="small float-right" href="{% url 'class-edit' classs.id %}">modyfikuj</a>#}
-{#                            {% endif %}#}
-{#                        {% endif %}#}
                 {% endfor %}
+
 </table>
           {% else %}
             <p>Brak przedmiotów</p>

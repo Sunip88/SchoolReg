@@ -11,7 +11,9 @@
                     <h4>Wychowawca: {{ student.classes.educator }}</h4>
                 </div>
             </div>
-        <a href="{% url 'add-notice' student.id %}">add-notice</a>
+        {% if user.profile.role == 2 %}
+            <a href="{% url 'add-notice' student.id %}">Dodaj uwagę</a>
+        {% endif %}
             <article class="media content-section">
               <div class="media-body">
 

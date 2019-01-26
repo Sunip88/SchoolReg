@@ -11,3 +11,4 @@ admin.site.register(WorkingHours)
 admin.site.register(Schedule)
 admin.site.register(ClassRoom)
 admin.site.register(PresenceList)
+
