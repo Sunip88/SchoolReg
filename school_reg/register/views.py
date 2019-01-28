@@ -261,6 +261,15 @@ class AddGradesClass(LoginRequiredMixin, UserPassesTestMixin, View):
         return False
 
 
+class TeacherDetailView(LoginRequiredMixin, View):
+
+    def get(self, request, pk):
+        teacher = get_object_or_404(Teacher, id=pk)
+        educator = teacher.classes_set.all()
+        ctx = {'teacher': teacher, 'educator': educator}
+        return render(request, 'register/teacher_details.html', ctx)
+
+
 class StudentDetailView(LoginRequiredMixin, View):
 
     def get(self, request, pk):

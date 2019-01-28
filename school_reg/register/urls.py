@@ -4,7 +4,7 @@ from .views import MainView, ClassView, AddClassView, EditClassView, DetailsClas
     TeacherSubjectsClassesView, TeacherGradesView, StudentView, PresenceView, ScheduleClasses, \
     ScheduleTeacherView, ScheduleRoomView, SchedulesView, AdvertAddView, NoticeAddView, ParentPanelView, \
     NoticeParentView, NoticeTeacherView, AdvertClassAddView, AdvertTeacherView, AdvertClassEditView, AdvertEditView, \
-    NoticeEditView, NoticeParentEditView, AnnouncementView
+    NoticeEditView, NoticeParentEditView, AnnouncementView, TeacherDetailView
 
 urlpatterns = [
     path("", MainView.as_view(), name="main"),
@@ -37,6 +37,7 @@ urlpatterns = [
     path("room_schedule/<int:id_room>/", ScheduleRoomView.as_view(), name='room-schedule'),
     path("detailed_class_grades/<int:subject_id>/<int:class_id>/", TeacherGradesView.as_view(), name='class-details-grades'),
     path("detailed_student/<int:pk>/", StudentDetailView.as_view(), name='student-details'),
+    path("detailed_teacher/<int:pk>/", TeacherDetailView.as_view(), name='teacher-details'),
     path("add_grades/<int:id_class>/<int:id_subject>/", AddGradesClass.as_view(), name='class-grade-add'),
     path("add_presence/<int:id_class>/<int:id_subject>/", PresenceView.as_view(), name='class-presence-add'),
 ]

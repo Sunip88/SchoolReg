@@ -5,7 +5,10 @@
                 <div class="media-body">
                     <h2 class="account-heading">Klasa: {{ detail_class.name }}</h2>
                     <h4>Opis: {{ detail_class.description }}</h4>
-                    <h4>Wychowawca: {{ detail_class.educator }}</h4>
+                    <h4>
+                        Wychowawca: <a href="{% url 'teacher-details' detail_class.educator.id %}">
+                        {{ detail_class.educator }}</a>
+                    </h4>
                     <h5><a href="{% url 'class-schedule' detail_class.id %}">Plan zajęć</a></h5>
                         {% if user.profile.role == 2 %}
                             {% if user.teacher == detail_class.educator %}
@@ -33,7 +36,9 @@
             <article class="media content-section">
               <div class="media-body">
                 <div class="article-metadata">
-                    <p class="mr-2">{{ advert.author.first_name }} {{ advert.author.last_name }}
+                    <p class="mr-2">
+                        <a href="{% url 'teacher-details' advert.author.id %}">
+                            {{ advert.author.user.first_name }} {{ advert.author.user.last_name }}</a>
                     {% if advert.author == request.user %}
                         <a href="{% url 'edit-advert-class' advert.id %}" class="float-right">Modyfikuj</a>
                     {% endif %}

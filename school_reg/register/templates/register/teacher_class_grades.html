@@ -4,7 +4,9 @@
     <article class="media content-section">
         <div class="media-body">
             <h2 class="account-heading">Klasa: {{ student_class.name }}</h2>
-            <h4>Wychowawca: {{ student_class.educator }}</h4>
+            <h4>Wychowawca: <a href="{% url 'teacher-details' student_class.educator.id %}">
+                {{ student_class.educator }}</a>
+            </h4>
             <h4>Przedmiot: {{ subject.name }}</h4>
         <br/>
         <h4><a href="{% url 'class-grade-add' class_id subject.id %}">Dodawanie ocen</a></h4>

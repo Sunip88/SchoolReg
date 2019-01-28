@@ -8,7 +8,9 @@
                 <article class="media content-section">
                   <div class="media-body">
                     <div class="article-metadata">
-                        <p class="mr-2">{{ notice.from_user.user.first_name }} {{ notice.from_user.user.last_name }}
+                        <p class="mr-2">
+                            <a href="{% url 'teacher-details' notice.from_user.user.teacher.id %}">
+                                {{ notice.from_user.user.first_name }} {{ notice.from_user.user.last_name }}</a>
                             {% if notice.accepted != None %}
                             <a href="{% url 'notice-edit-parent' notice.id %}" class="float-right">Modyfikuj</a>
                             {% endif %}

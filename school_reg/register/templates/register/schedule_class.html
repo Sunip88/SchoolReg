@@ -5,9 +5,13 @@
         <div class="media-body">
         {% if student_class %}
             <h3 class="account-heading">Klasa: {{ student_class.name }}</h3>
-            <h4>Wychowawca: {{ student_class.educator }}</h4>
+            <h4>Wychowawca:
+                <a href="{% url 'teacher-details' student_class.educator.id %}">{{ student_class.educator }}</a></h4>
         {% elif teacher %}
-            <h3 class="account-heading">Nauczyciel: {{ teacher.user.first_name }} {{ teacher.user.last_name }}</h3>
+            <h3 class="account-heading">Nauczyciel:
+                <a href="{% url 'teacher-details' teacher.id %}">
+                    {{ teacher.user.first_name }} {{ teacher.user.last_name }}</a>
+            </h3>
         {% elif room %}
             <h3 class="account-heading">Sala: {{ room.name }}</h3>
         {% endif %}

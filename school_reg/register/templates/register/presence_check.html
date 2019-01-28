@@ -6,7 +6,8 @@
                 <div class="media-body">
                     <h2 class="account-heading">Klasa: {{ detail_class.name }}</h2>
                     <h4>Opis: {{ detail_class.description }}</h4>
-                    <h4>Wychowawca: {{ detail_class.educator }}</h4>
+                    <h4>Wychowawca: <a href="{% url teacher-details detail_class.educator.id %}">
+                        {{ detail_class.educator }}</a></h4>
                     <h4>Przedmiot: {{ subject.name }}
                     </h4>
                     {% teacher_class_subject subject detail_class as teacher %}

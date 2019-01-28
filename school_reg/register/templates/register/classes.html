@@ -5,7 +5,7 @@
                 {% for classs in classes %}
                     <div class="article-metadata">
                         <a class="mr-2" href="{% url 'class-details' classs.id %}">{{ classs.name }}</a>
-                         - {{ classs.educator }}
+                        - <a href="{% url 'teacher-details' classs.educator.id %}">{{ classs.educator }}</a>
                         {% if 'register' in perms %}
                             {% if 'register.change_clasess' in perms %}
                                 <a class="small float-right" href="{% url 'class-edit' classs.id %}">modyfikuj</a>
