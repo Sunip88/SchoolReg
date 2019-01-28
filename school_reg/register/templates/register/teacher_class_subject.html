@@ -1,4 +1,5 @@
 {% extends "register/base.html" %}
+{% load register.extras %}
 {% block content %}
         <article class="media content-section">
           <div class="media-body">
@@ -10,25 +11,6 @@
                         <th>Dodawanie ocen</th>
                         <th>Sprawdzanie obecnosci</th>
                     </tr>
-{#                {% for subject in subjects %}#}
-{#                    {% for class in subject.classes.all %}#}
-{#                    <tr>#}
-{#                        <td>#}
-{#                            <a class="mr-2" href="{% url 'class-details-grades' subject.id class.id %}">#}
-{#                                {{ subject.name }} {{ class.name }} - {{ class.educator }}#}
-{#                            </a>#}
-{#                        </td>#}
-{#                        <td>#}
-{#                            <a class="mr-2" href="{% url 'class-grade-add' class.id subject.id %}">Dodawanie Ocen</a>#}
-{#                        </td>#}
-{#                        <td>#}
-{#                            <a class="mr-2" href="{% url 'class-presence-add' class.id subject.id %}">#}
-{#                                Sprawdzenie obecności#}
-{#                            </a>#}
-{#                        </td>#}
-{#                    </tr>#}
-{#                    {% endfor %}#}
-{#                {% endfor %}#}
                   {% for item in subjects %}
                     <tr>
                         <td>
@@ -40,9 +22,13 @@
                             <a class="mr-2" href="{% url 'class-grade-add' item.classes.id item.subject.id %}">Dodawanie Ocen</a>
                         </td>
                         <td>
-                            <a class="mr-2" href="{% url 'class-presence-add' item.classes.id item.subject.id %}">
-                                Sprawdzenie obecności
-                            </a>
+                            {% if item|subject_today:weekday_now %}
+                                <a class="mr-2" href="{% url 'class-presence-add' item.classes.id item.subject.id %}">
+                                    Sprawdzenie obecności
+                                </a>
+                            {% else %}
+                                <p>dzisiaj nie ma zajec</p>
+                            {% endif %}
                         </td>
                     </tr>
                 {% endfor %}

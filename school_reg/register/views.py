@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect, get_object_or_404
@@ -61,6 +61,7 @@ class TeacherSubjectsClassesView(LoginRequiredMixin, UserPassesTestMixin, View):
     def get(self, request):
         teacher = Teacher.objects.get(user_id=request.user.id)
         schedule = Schedule.objects.filter(teacher=teacher)
+        weekday_now = datetime.now().weekday()
         subjects = []
         temp = []
         if schedule:
@@ -69,10 +70,9 @@ class TeacherSubjectsClassesView(LoginRequiredMixin, UserPassesTestMixin, View):
                 if i not in temp:
                     subjects.append(item)
                     temp.append(str(item.subject) + str(item.classes.name))
-            print(subjects)
         else:
             subjects = []
-        ctx = {'teacher': teacher, 'subjects': subjects, 'schedule': schedule}
+        ctx = {'teacher': teacher, 'subjects': subjects, 'schedule': schedule, 'weekday_now': weekday_now}
         return render(request, 'register/teacher_class_subject.html', ctx)
 
     def test_func(self):
@@ -268,11 +268,16 @@ class StudentDetailView(LoginRequiredMixin, View):
         if not self.my_test(student):
             raise PermissionDenied
         grades = student.grades_set.all()
+        date_now = datetime.now()
+        date_four_weeks = date_now - timedelta(weeks=4)
+        presence = PresenceList.objects.filter(student=student, day__gte=date_four_weeks)
+        subjects_all = student.classes.subject_set.all()
         subjects = {}
         for g in grades:
             if g.subject.id not in subjects.keys():
                 subjects[g.subject.id] = g.subject.name
-        ctx = {'student': student, 'grades': grades, 'subjects': subjects}
+        ctx = {'student': student, 'grades': grades, 'subjects': subjects, 'presence': presence,
+               'subject_all': subjects_all}
         return render(request, 'register/student_details.html', ctx)
 
     def my_test(self, student):

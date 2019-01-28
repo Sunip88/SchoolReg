@@ -1,43 +1,68 @@
 {% extends "register/base.html" %}
 {% load register.extras %}
 {% block content %}
-        <div class="content-section">
-            <div class="media">
-                <div class="media-body">
-                    <h2 class="account-heading">
-                        Imie i nazwisko: {{ student.user.first_name }} {{ student.user.last_name }}
-                    </h2>
-                    <h4>Klasa: {{ student.classes.name }}</h4>
-                    <h4>Wychowawca: {{ student.classes.educator }}</h4>
+    <div class="content-section">
+        <div class="media">
+            <img class="rounded-circle article-img" src="{{ student.user.profile.image.url }}">
+            <div class="media-body">
+                <h4 class="account-heading">
+                    Imie i nazwisko: {{ student.user.first_name }} {{ student.user.last_name }}
+                </h4>
+                <h4>Klasa: {{ student.classes.name }}</h4>
+                <h4>Wychowawca: {{ student.classes.educator }}</h4>
+                {% if user.profile.role == 2 %}
+                    <a href="{% url 'add-notice' student.id %}">Dodaj uwagę</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <h5>Oceny:</h5>
+        <article class="media content-section">
+            <div class="media-body">
+                <div class="article-metadata">
+                    <table class="table">
+                        <tr>
+                            <th>Przedmiot</th>
+                            <th>Oceny</th>
+                            <th>Srednia</th>
+                        </tr>
+                        {% for key, value in subjects.items %}
+                        <tr>
+                            {% grades_all key student.id as grades %}
+                            <td><a href="{% url 'class-details-grades' key student.classes.id %}">{{ value }}</a></td>
+                            <td>{{ grades.0 }}</td>
+                            <td>{{ grades.1 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
                 </div>
             </div>
-        {% if user.profile.role == 2 %}
-            <a href="{% url 'add-notice' student.id %}">Dodaj uwagę</a>
-        {% endif %}
-            <article class="media content-section">
-              <div class="media-body">
-
-                        <div class="article-metadata">
-                            <ul>
-                                {% for key, value in subjects.items %}
-                                    <li><a href="{% url 'class-details-grades' key student.classes.id %}">{{ value }}</a>
-                                    {{ key|grades_all:student.id }}
-                                    </li>
-                                {% endfor %}
-                            </ul>
-{#                            <a class="mr-2" href="#">{{ classs }}</a>#}
-    {#                        {% if 'register' in perms %}#}
-    {#                            {% if 'register.change_clasess' in perms %}#}
-    {#                                <a class="small float-right" href="{% url 'class-edit' classs.id %}">modyfikuj</a>#}
-    {#                            {% endif %}#}
-    {#                        {% endif %}#}
-                        </div>
-              </div>
-            </article>
-        </div>
-{#    {% if 'register' in perms %}#}
-{#        {% if 'register.add_clasess' in perms %}#}
-{#            <h3><a class="btn btn-outline-info small" href="{% url 'class-add' %}">dodaj</a></h3>#}
-{#        {% endif %}#}
-{#    {% endif %}#}
+        </article>
+        <h5>Obecnosc w ostatnich 4 tygodniach:</h5>
+        <article class="media content-section">
+            <div class="media-body">
+                <div class="article-metadata">
+                    <table class="table">
+                        <tr>
+                            <th>Przedmiot</th>
+                            <th>Ilosc zajec</th>
+                            <th>Obecnosc</th>
+                            <th>Nieobecnosc</th>
+                            <th>%</th>
+                        </tr>
+                        {% for subject in subject_all %}
+                        <tr>
+                            {% presence_by_subject presence subject as present %}
+                            <td>{{ subject }}</td>
+                            <td>{{ present.0 }}</td>
+                            <td>{{ present.1 }}</td>
+                            <td>{{ present.2 }}</td>
+                            <td>{{ present.3 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </article>
+    </div>
 {% endblock content %}
