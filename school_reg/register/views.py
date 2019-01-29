@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import View
@@ -677,8 +678,23 @@ class AnnouncementView(LoginRequiredMixin, UserPassesTestMixin, View):
         ctx = {'children': children, 'children_flag': children_flag}
         return render(request, 'register/announcements_list.html', ctx)
 
+    def post(self, request):
+        pass
+
     def test_func(self):
         user = self.request.user
         if user.profile.role == 1:
             return True
         return False
+
+
+class AnnouncementOnlineView(LoginRequiredMixin, View):
+
+    def get(self, request):
+        count = 0
+        if request.user.profile.role == 1:
+            parent = Parent.objects.get(user_id=request.user.id)
+            children = parent.students.all()
+            for child in children:
+                count += Announcements.objects.filter(user=child.user).count()
+            return HttpResponse(str(count))

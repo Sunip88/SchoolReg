@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views import View
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin, UserPassesTestMixin
@@ -7,7 +8,7 @@ from django.contrib.auth import views as auth_views, login, authenticate
 from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
 
-from users.models import Messages
+from users.models import Messages, Profile
 from .forms import UserTeacherRegisterForm, UserUpdateForm, ProfileUpdateForm, StudentRegisterForm, \
     ParentRegisterForm, UserParentStudentRegisterForm, MessagesAddForm
 from register.models import Student, Teacher, Parent
@@ -165,8 +166,11 @@ class ChangePasswordView(LoginRequiredMixin, View):
         return render(request, "users/user_confirm_password_change.html", {'form': form})
 
     def post(self, request):
+        profile = Profile.objects.get(user_id=request.user.id)
         form = PasswordChangeForm(request.user, request.POST)
         if form.is_valid():
+            profile.temp_password = ''
+            profile.save()
             user = form.save()
             auth_views.update_session_auth_hash(request, user)
             messages.success(request, "Hasło zostało zmienione")
@@ -176,3 +180,10 @@ class ChangePasswordView(LoginRequiredMixin, View):
         return render(request, "users/user_confirm_password_change.html", locals())
 
 
+class PasswordOnlineView(LoginRequiredMixin, View):
+
+    def get(self, request):
+        if request.user.profile.role != 2:
+            if request.user.profile.temp_password != '':
+                return HttpResponse(str(1))
+        return HttpResponse(str(0))

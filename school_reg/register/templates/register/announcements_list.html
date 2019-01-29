@@ -4,6 +4,7 @@
 {% block content %}
     <h3 class="mb-3">Powiadomienia</h3>
     {% if children %}
+        <form>
         {% for child in children %}
             {% if children_flag %}
             <h4>{{ child.user.first_name }} {{ child.user.last_name }}</h4>
@@ -15,17 +16,19 @@
                     <div class="article-metadata">
                         <small class="text-muted">{{ one.date|date:"F d, Y" }} </small>
                     </div>
-                  <a class="article-title" href="#">
                     {% if one.read == False %}
                         <p class="article-content font-weight-bold">{{ one.text }}</p>
                     {% else %}
                         <p class="article-content">{{ one.text }}</p>
                     {% endif %}
-                  </a>
+                  <input type="checkbox" name="delete" value="{{ one.id }}"> Usuń
+                  <input type="checkbox" name="read" value="{{ one.id }}"> Oznacz jako przeczytane
                   </div>
                 </article>
             {% endfor %}
         {% endfor %}
+        <button class="btn btn-outline-info" type="submit" name="button">Zatwierdz</button>
+        </form>
     {% else %}
         <h4 class="mb-3">Brak powiadomien</h4>
     {% endif %}

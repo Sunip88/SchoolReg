@@ -2,10 +2,10 @@
 {% load crispy_forms_tags %}
 {% load register.extras %}
 {% block content %}
-    <div class="jumbotron bg-steel-2 text-center">
-        <h4 class="display-4">Panel ucznia</h4>
+    <div class="text-center">
+        <h2>Panel ucznia</h2>
         <hr class="my-4">
-        <p class="lead">
+            <p class="lead">
             <div class="d-flex justify-content-center flex-wrap">
                 <a class="btn btn-lg btn-info btn-main m-2" href="{% url 'class-details' student_class.id %}" role="button">Klasa</a>
                 <a class="btn btn-lg btn-info btn-main m-2" href="{% url 'class-schedule' student_class.id %}" role="button">Plan zajęć</a>

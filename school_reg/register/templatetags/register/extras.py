@@ -171,3 +171,22 @@ def check_week(schedule):
     if temp == 2:
         return True
     return False
+
+@register.filter()
+def check_role(student, user):
+    role = user.profile.role
+    if role == 2:
+        return True
+    elif role == 0:
+        if user.student == student:
+            return True
+        else:
+            return False
+    else:
+        children = user.parent.students.all()
+        if children:
+            for child in children:
+                if child == student:
+                    return True
+    return False
+
