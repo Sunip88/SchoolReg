@@ -1,15 +1,55 @@
 {% extends "register/base.html" %}
 {% load register.extras %}
+{% load static %}
 {% block content %}
+    <article class="media content-section">
+          <div class="media-body">
+          {% if schedule_now %}
+              <h3>Dzisiejsze zajęcia</h3><br>
+              <table class="table">
+                    <tr>
+                        <th>Przedmiot, klasa, wychowawca</th>
+                        <th>Godzina rozpoczęcia</th>
+                        <th>Dodawanie ocen</th>
+                        <th>Sprawdzanie obecnosci</th>
+                    </tr>
+                  {% for item in schedule_now %}
+                        {% if item.hours.start_time|check_old %}
+                    <tr>
+                        {% else %}
+                    <tr class="table-inactive">
+                        {% endif %}
+                        <td>
+                            <a class="mr-2" href="{% url 'class-details-grades' item.subject.id item.classes.id %}">
+                                {{ item.subject.name }} {{ item.classes.name }} - {{ item.classes.educator }}
+                            </a>
+                        </td>
+                        <td id="timer-data" >{{ item.hours.start_time|date:"H:i" }}</td>
+                        <td>
+                            <a class="mr-2" href="{% url 'class-grade-add' item.classes.id item.subject.id %}">Dodawanie Ocen</a>
+                        </td>
+                        <td>
+                            <a class="mr-2" href="{% url 'class-presence-add' item.classes.id item.id %}">
+                                Sprawdzenie obecności
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+
+                </table>
+          {% else %}
+            <h3>Brak zajęć w dniu dzisiejszym</h3>
+          {% endif %}
+          </div>
+        </article>
         <article class="media content-section">
           <div class="media-body">
-          <h4>Klasy których uczysz</h4><br>
+          <h3>Klasy których uczysz</h3><br>
           {% if subjects %}
               <table class="table">
                     <tr>
                         <th>Przedmiot, klasa, wychowawca</th>
                         <th>Dodawanie ocen</th>
-                        <th>Sprawdzanie obecnosci</th>
                     </tr>
                   {% for item in subjects %}
                     <tr>
@@ -21,19 +61,10 @@
                         <td>
                             <a class="mr-2" href="{% url 'class-grade-add' item.classes.id item.subject.id %}">Dodawanie Ocen</a>
                         </td>
-                        <td>
-                            {% if item|subject_today:weekday_now %}
-                                <a class="mr-2" href="{% url 'class-presence-add' item.classes.id item.subject.id %}">
-                                    Sprawdzenie obecności
-                                </a>
-                            {% else %}
-                                <p>dzisiaj nie ma zajec</p>
-                            {% endif %}
-                        </td>
                     </tr>
                 {% endfor %}
 
-</table>
+                </table>
           {% else %}
             <p>Brak przedmiotów</p>
           {% endif %}

@@ -1,6 +1,6 @@
 #!/usr/bin/python3.7
 from django import template
-from datetime import datetime
+from datetime import datetime, date, timedelta
 from register.models import Grades, Teacher, Student, Schedule
 
 register = template.Library()
@@ -43,9 +43,9 @@ def student_presence(student, subject):
 
 
 @register.filter()
-def student_presence_get(student, subject):
+def student_presence_get(student, schedule):
     today = datetime.now().date()
-    presence = student.presencelist_set.filter(subject_id=subject.id, day=today)
+    presence = student.presencelist_set.filter(subject=schedule, day=today)
     if presence:
         presence = presence.first()
         return presence.present
@@ -76,7 +76,12 @@ def teacher_class_subject(subject, detail_class):
 
 @register.simple_tag
 def schedule_choice(classes, hours, weekday):
-    schedule = Schedule.objects.filter(classes_id=classes.id, weekday=weekday[0], hours=hours)
+    h_start = hours.start_time
+    h_end = hours.end_time
+    schedule = Schedule.objects.filter(classes_id=classes.id,
+                                       weekday=weekday[0],
+                                       hours__start_time__exact=h_start,
+                                       hours__end_time__exact=h_end)
     if schedule:
         return schedule.first()
     else:
@@ -85,7 +90,12 @@ def schedule_choice(classes, hours, weekday):
 
 @register.simple_tag
 def schedule_choice_teacher(teacher, hours, weekday):
-    schedule = Schedule.objects.filter(weekday=weekday[0], hours=hours, teacher=teacher)
+    h_start = hours.start_time
+    h_end = hours.end_time
+    schedule = Schedule.objects.filter(weekday=weekday[0],
+                                       teacher=teacher,
+                                       hours__start_time__exact=h_start,
+                                       hours__end_time__exact=h_end)
     if schedule:
         return schedule.first()
     else:
@@ -94,7 +104,12 @@ def schedule_choice_teacher(teacher, hours, weekday):
 
 @register.simple_tag
 def schedule_choice_room(room, hours, weekday):
-    schedule = Schedule.objects.filter(weekday=weekday[0], hours=hours, room=room)
+    h_start = hours.start_time
+    h_end = hours.end_time
+    schedule = Schedule.objects.filter(weekday=weekday[0],
+                                       room=room,
+                                       hours__start_time__exact=h_start,
+                                       hours__end_time__exact=h_end)
     if schedule:
         return schedule.first()
     else:
@@ -128,5 +143,31 @@ def presence_by_subject(presence, subject):
 @register.filter()
 def subject_today(item, weekday):
     if item.weekday - 1 == weekday:
+        return True
+    return False
+
+
+@register.filter()
+def check_old(start_hour):
+    now = datetime.now()
+    start = datetime.combine(date.today(), start_hour)
+    if now < start:
+        return True
+    return False
+
+
+@register.filter()
+def check_week(schedule):
+    temp = 0
+    if schedule:
+        now = datetime.now()
+        now_week = now.weekday() + 1
+        weekday = schedule.weekday
+        if weekday <= now_week:
+            temp += 1
+        start = datetime.combine(date.today(), schedule.hours.start_time)
+        if now > start:
+            temp += 1
+    if temp == 2:
         return True
     return False

@@ -16,6 +16,7 @@
             <h3 class="account-heading">Sala: {{ room.name }}</h3>
         {% endif %}
         <br/>
+        <div style="overflow-x: auto">
             <table class="table" cellpadding="6">
             {% for day in weekdays %}
                 {% if day.1 == weekdays.0.1 %}
@@ -29,11 +30,15 @@
                 {% for h in hours %}
                     <tr>
                         <td>{{ h.nr }}</td>
-                        <td>{{ h.hours }}</td>
+                        <td>{{ h.start_time|date:"H:i" }} - {{ h.end_time|date:"H:i" }}</td>
                         {% for day in weekdays_day %}
                             {% if student_class %}
                                 {% schedule_choice student_class h day as schedule %}
+                                {% if schedule|check_week %}
+                                <td class="table-inactive">
+                                {% else %}
                                 <td>
+                                {% endif %}
                                 {% if schedule %}
                                     {{ schedule.subject.name }}<br>
                                     <a href="{% url 'room-schedule' schedule.room.id %}">{{ schedule.room.name }}</a><br>
@@ -44,7 +49,11 @@
                                 </td>
                             {% elif teacher %}
                                 {% schedule_choice_teacher teacher h day as schedule %}
+                                {% if schedule|check_week %}
+                                <td class="table-inactive">
+                                {% else %}
                                 <td>
+                                {% endif %}
                                 {% if schedule %}
                                     {{ schedule.subject.name }}<br>
                                     <a href="{% url 'class-schedule' schedule.classes.id %}">{{ schedule.classes.name }}</a><br>
@@ -53,7 +62,11 @@
                                 </td>
                             {% elif room %}
                                 {% schedule_choice_room room h day as schedule %}
+                                {% if schedule|check_week %}
+                                <td class="table-inactive">
+                                {% else %}
                                 <td>
+                                {% endif %}
                                 {% if schedule %}
                                     {{ schedule.subject.name }}<br>
                                     <a href="{% url 'teacher-schedule' schedule.teacher.id %}">
@@ -67,6 +80,7 @@
                     </tr>
                 {% endfor %}
             </table>
+        </div>
         </div>
     </article>
 {% endblock content %}

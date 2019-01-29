@@ -1,16 +1,20 @@
 {% extends "register/base.html" %}
 {% load register.extras %}
+{% load static %}
+{% block js_load %}
+    <script src="{% static "register/main.js" %}" type="text/javascript"></script>
+{% endblock js_load %}
 {% block content %}
         <div class="content-section">
             <div class="media">
                 <div class="media-body">
                     <h2 class="account-heading">Klasa: {{ detail_class.name }}</h2>
                     <h4>Opis: {{ detail_class.description }}</h4>
-                    <h4>Wychowawca: <a href="{% url teacher-details detail_class.educator.id %}">
+                    <h4>Wychowawca: <a href="{% url 'teacher-details' detail_class.educator.id %}">
                         {{ detail_class.educator }}</a></h4>
-                    <h4>Przedmiot: {{ subject.name }}
+                    <h4>Przedmiot: {{ schedule.subject.name }}
                     </h4>
-                    {% teacher_class_subject subject detail_class as teacher %}
+                    {% teacher_class_subject schedule.subject detail_class as teacher %}
                     <h4>Nauczyciel przedmiotu: {{ teacher }}</h4>
                     <h5>Dzisiaj: {{ today }}</h5>
                 </div>
@@ -30,10 +34,10 @@
                                     <tr>
                                         <td>{{ forloop.counter }}</td>
                                         <td><a href="{% url 'student-details' student.id %}">{{ student }}</a></td>
-                                    {% if not student|student_presence_get:subject %}
-                                        <td><input type="checkbox" name="student" value="{{ student.id }}"></td>
+                                    {% if not student|student_presence_get:schedule %}
+                                        <td><input class="students" type="checkbox" name="student" value="{{ student.id }}"></td>
                                     {% else %}
-                                        <td><input type="checkbox" name="student" value="{{ student.id }}" checked></td>
+                                        <td><input class="students" type="checkbox" name="student" value="{{ student.id }}" checked></td>
                                     {% endif %}
                                     </tr>
                                 {% endfor %}

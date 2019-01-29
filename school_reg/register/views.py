@@ -60,19 +60,21 @@ class ParentPanelView(LoginRequiredMixin, UserPassesTestMixin, View):
 class TeacherSubjectsClassesView(LoginRequiredMixin, UserPassesTestMixin, View):
     def get(self, request):
         teacher = Teacher.objects.get(user_id=request.user.id)
-        schedule = Schedule.objects.filter(teacher=teacher)
         weekday_now = datetime.now().weekday()
+        schedule_all = Schedule.objects.filter(teacher=teacher)
+        schedule_now = schedule_all.filter(weekday=weekday_now + 1)
         subjects = []
         temp = []
-        if schedule:
-            for item in schedule:
+        if schedule_all:
+            for item in schedule_all:
                 i = str(item.subject) + str(item.classes.name)
                 if i not in temp:
                     subjects.append(item)
                     temp.append(str(item.subject) + str(item.classes.name))
         else:
             subjects = []
-        ctx = {'teacher': teacher, 'subjects': subjects, 'schedule': schedule, 'weekday_now': weekday_now}
+        ctx = {'teacher': teacher, 'subjects': subjects, 'schedule': schedule_all, 'weekday_now': weekday_now,
+               'schedule_now': schedule_now}
         return render(request, 'register/teacher_class_subject.html', ctx)
 
     def test_func(self):
@@ -310,20 +312,22 @@ class StudentDetailView(LoginRequiredMixin, View):
 
 class PresenceView(LoginRequiredMixin, UserPassesTestMixin, View):
 
-    def get(self, request, id_class, id_subject):
+    def get(self, request, id_class, id_schedule):
         detail_class = get_object_or_404(Classes, id=id_class)
         students = Student.objects.filter(classes_id=detail_class.id)
-        subject = get_object_or_404(Subject, id=id_subject)
-        if not self.my_test(subject, detail_class):
-            raise PermissionDenied
+        schedule = get_object_or_404(Schedule, id=id_schedule)
         today = datetime.now().strftime('%Y-%m-%d')
-        ctx = {'detail_class': detail_class, 'students': students, 'subject': subject, 'today': today}
+        if not self.my_test(schedule):
+            raise PermissionDenied
+        ctx = {'detail_class': detail_class, 'students': students, 'today': today, 'schedule': schedule}
         return render(request, 'register/presence_check.html', ctx)
 
-    def post(self, request, id_class, id_subject):
+    def post(self, request, id_class, id_schedule):
         detail_class = get_object_or_404(Classes, id=id_class)
+        schedule = get_object_or_404(Schedule, id=id_schedule)
+        if not self.my_test(schedule):
+            raise PermissionDenied
         students = Student.objects.filter(classes_id=detail_class.id)
-        subject = get_object_or_404(Subject, id=id_subject)
         today = datetime.now()
         date_formated = today.strftime('%Y-%m-%d')
         day = today.date()
@@ -332,7 +336,7 @@ class PresenceView(LoginRequiredMixin, UserPassesTestMixin, View):
         for student in students:
             presence = PresenceList.objects.filter(student=student,
                                                    day=day,
-                                                   subject=subject)
+                                                   subject=schedule)
             if student.id in student_presence:
                 if len(presence) > 0:
                     presence = presence.first()
@@ -341,12 +345,12 @@ class PresenceView(LoginRequiredMixin, UserPassesTestMixin, View):
                 else:
                     PresenceList.objects.create(student=student,
                                                 day=day,
-                                                subject=subject,
+                                                subject=schedule,
                                                 present=True)
             else:
                 name = student.user.first_name
                 surname = student.user.last_name
-                text = f"{name} {surname} był nieobecny na {subject} w dniu {date_formated}"
+                text = f"{name} {surname} był nieobecny na {schedule.subject.name} w dniu {date_formated}"
                 if len(presence) > 0:
                     presence = presence.first()
                     if presence.present:
@@ -357,13 +361,13 @@ class PresenceView(LoginRequiredMixin, UserPassesTestMixin, View):
                 else:
                     PresenceList.objects.create(student=student,
                                                 day=day,
-                                                subject=subject,
+                                                subject=schedule,
                                                 present=False)
                     Announcements.objects.create(text=text,
                                                  user=student.user)
 
         messages.success(request, 'Zaktualizowano obecności')
-        return redirect('class-presence-add', id_class=id_class, id_subject=id_subject)
+        return redirect('class-presence-add', id_class=id_class, id_schedule=id_schedule)
 
     def test_func(self):
         user = self.request.user
@@ -371,12 +375,9 @@ class PresenceView(LoginRequiredMixin, UserPassesTestMixin, View):
             return True
         return False
 
-    def my_test(self, subject, classes):
-        teacher = Schedule.objects.filter(classes=classes, subject=subject)
-        if teacher:
-            teacher = teacher.first().teacher
-            if self.request.user.teacher == teacher:
-                return True
+    def my_test(self, schedule):
+        if self.request.user.teacher == schedule.teacher:
+            return True
         return False
 
 
@@ -667,15 +668,12 @@ class AdvertTeacherView(LoginRequiredMixin, UserPassesTestMixin, View):
 class AnnouncementView(LoginRequiredMixin, UserPassesTestMixin, View):
 
     def get(self, request):
-        if request.user.profile.role == 1:
-            parent = Parent.objects.get(user_id=request.user.id)
-            children = parent.students.all()
-            if len(children) > 1:
-                children_flag = True
-            else:
-                children_flag = False
-        #     object_list = Announcements.objects.filter(user=request.user.parent.students)
-        # object_list = Announcements.objects.filter(user=request.user)
+        parent = Parent.objects.get(user_id=request.user.id)
+        children = parent.students.all()
+        if len(children) > 1:
+            children_flag = True
+        else:
+            children_flag = False
         ctx = {'children': children, 'children_flag': children_flag}
         return render(request, 'register/announcements_list.html', ctx)
 

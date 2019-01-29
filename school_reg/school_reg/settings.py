@@ -80,7 +80,7 @@ WSGI_APPLICATION = 'school_reg.wsgi.application'
 DATABASES = {
     'default': {
         'HOST': '127.0.0.1',
-        'NAME': 'proj_school_reg',
+        'NAME': 'proj_school_register',
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'USER': db_user,
         'PASSWORD': db_pass,

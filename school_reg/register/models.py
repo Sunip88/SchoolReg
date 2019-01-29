@@ -95,7 +95,7 @@ class PresenceList(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     day = models.DateField()
     present = models.NullBooleanField()
-    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    subject = models.ForeignKey('register.Schedule', on_delete=models.CASCADE)
 
 
 class ClassRoom(models.Model):
@@ -107,10 +107,11 @@ class ClassRoom(models.Model):
 
 class WorkingHours(models.Model):
     nr = models.IntegerField()
-    hours = models.CharField(max_length=16)
+    start_time = models.TimeField()
+    end_time = models.TimeField()
 
     def __str__(self):
-        return self.hours
+        return f"{self.start_time} - {self.end_time}"
 
 
 class Schedule(models.Model):

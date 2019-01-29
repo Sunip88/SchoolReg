@@ -39,5 +39,5 @@ urlpatterns = [
     path("detailed_student/<int:pk>/", StudentDetailView.as_view(), name='student-details'),
     path("detailed_teacher/<int:pk>/", TeacherDetailView.as_view(), name='teacher-details'),
     path("add_grades/<int:id_class>/<int:id_subject>/", AddGradesClass.as_view(), name='class-grade-add'),
-    path("add_presence/<int:id_class>/<int:id_subject>/", PresenceView.as_view(), name='class-presence-add'),
+    path("add_presence/<int:id_class>/<int:id_schedule>/", PresenceView.as_view(), name='class-presence-add'),
 ]
