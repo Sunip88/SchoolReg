@@ -679,7 +679,17 @@ class AnnouncementView(LoginRequiredMixin, UserPassesTestMixin, View):
         return render(request, 'register/announcements_list.html', ctx)
 
     def post(self, request):
-        pass
+        approved = request.POST.get("approved")
+        event, id_ann = approved.split("_")
+        if event == 'deleted':
+            announcement = get_object_or_404(Announcements, id=id_ann)
+            announcement.deleted = True
+            announcement.save()
+        else:
+            announcement = get_object_or_404(Announcements, id=id_ann)
+            announcement.read = True
+            announcement.save()
+        return HttpResponse('great')
 
     def test_func(self):
         user = self.request.user
@@ -696,5 +706,5 @@ class AnnouncementOnlineView(LoginRequiredMixin, View):
             parent = Parent.objects.get(user_id=request.user.id)
             children = parent.students.all()
             for child in children:
-                count += Announcements.objects.filter(user=child.user).count()
+                count += Announcements.objects.filter(user=child.user, read=False, deleted=False).count()
             return HttpResponse(str(count))

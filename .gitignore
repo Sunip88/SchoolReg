@@ -1,7 +1,7 @@
 0_test/
 locals.py
 # Created by https://www.gitignore.io/api/python,visualstudiocode
-
+bower_components/
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -71,7 +71,8 @@ docs/_build/
 
 # PyBuilder
 target/
-
+assets/
+npm-debug.log
 # Jupyter Notebook
 .ipynb_checkpoints
 

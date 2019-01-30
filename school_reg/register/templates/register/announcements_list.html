@@ -1,33 +1,39 @@
 {% extends "register/main.html" %}
 {% load users.extras %}
-
+{% load static %}
+{% block js_load %}
+    <script src="{% static 'register/announcement_read_delete.js' %}" type="text/javascript"></script>
+{% endblock js_load %}
 {% block content %}
     <h3 class="mb-3">Powiadomienia</h3>
     {% if children %}
-        <form>
+        <form method="POST" id="ann_form">
+        {% csrf_token %}
         {% for child in children %}
             {% if children_flag %}
             <h4>{{ child.user.first_name }} {{ child.user.last_name }}</h4>
             {% endif %}
             {% announcements_for_child child as announcements %}
             {% for one in announcements %}
+                {% if one.deleted == False %}
                 <article class="media content-section">
                   <div class="media-body">
                     <div class="article-metadata">
                         <small class="text-muted">{{ one.date|date:"F d, Y" }} </small>
+                        <small class="text-muted float-right btn btn-sm delete_btn" id="delete_btn" data-one="deleted_{{ one.id }}">X</small>
                     </div>
+
                     {% if one.read == False %}
                         <p class="article-content font-weight-bold">{{ one.text }}</p>
+                        <small class="text-muted float-right btn btn-sm read_btn" id="read_btn" data-one="read_{{ one.id }}">oznacz jako przeczytane</small>
                     {% else %}
                         <p class="article-content">{{ one.text }}</p>
                     {% endif %}
-                  <input type="checkbox" name="delete" value="{{ one.id }}"> Usuń
-                  <input type="checkbox" name="read" value="{{ one.id }}"> Oznacz jako przeczytane
                   </div>
                 </article>
+                {% endif %}
             {% endfor %}
         {% endfor %}
-        <button class="btn btn-outline-info" type="submit" name="button">Zatwierdz</button>
         </form>
     {% else %}
         <h4 class="mb-3">Brak powiadomien</h4>
