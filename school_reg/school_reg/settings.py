@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
-from locals import db_pass, db_user
+from locals import db_pass, db_user, db_host, db_name, secret_key
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -21,7 +21,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '%b$zwrd1z!y#q0iw&r_9m__(ua#yucrad_9v+o6&y=w=mbibl&'
+SECRET_KEY = secret_key
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'users.apps.UsersConfig',
     'register.apps.RegisterConfig',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
@@ -79,8 +80,8 @@ WSGI_APPLICATION = 'school_reg.wsgi.application'
 
 DATABASES = {
     'default': {
-        'HOST': '127.0.0.1',
-        'NAME': 'proj_school_register',
+        'HOST': db_host,
+        'NAME': db_name,
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'USER': db_user,
         'PASSWORD': db_pass,
