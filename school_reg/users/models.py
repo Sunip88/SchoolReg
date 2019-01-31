@@ -30,14 +30,3 @@ class Profile(models.Model):
             img.thumbnail(output_size)
             img.save(self.image.path)
 
-
-class Messages(models.Model):
-    content = models.TextField()
-    send_date = models.DateTimeField(auto_now_add=True)
-    send_to = models.ForeignKey(User, on_delete=models.SET("Deleted"), related_name="user_to")
-    send_from = models.ForeignKey(User, on_delete=models.SET("Deleted"), related_name="user_from")
-    read = models.BooleanField(default=False)
-    deleted = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"{self.send_from} - {self.send_to} >>> {self.content[0:30]}"
