@@ -12,6 +12,7 @@
                         <th>Godzina rozpoczęcia</th>
                         <th>Dodawanie ocen</th>
                         <th>Sprawdzanie obecnosci</th>
+                        <th>Dodawanie wydarzenia</th>
                     </tr>
                   {% for item in schedule_now %}
                         {% if item.hours.start_time|check_old %}
@@ -33,6 +34,9 @@
                                 Sprawdzenie obecności
                             </a>
                         </td>
+                        <td>
+                            <a class="mr-2" href="{% url 'add-event' item.id %}">Dodaj</a>
+                        </td>
                     </tr>
                 {% endfor %}
 
@@ -50,6 +54,7 @@
                     <tr>
                         <th>Przedmiot, klasa, wychowawca</th>
                         <th>Dodawanie ocen</th>
+                        <th>Wydarzenia</th>
                     </tr>
                   {% for item in subjects %}
                     <tr>
@@ -60,6 +65,9 @@
                         </td>
                         <td>
                             <a class="mr-2" href="{% url 'class-grade-add' item.classes.id item.subject.id %}">Dodawanie Ocen</a>
+                        </td>
+                        <td>
+                            <a class="mr-2" href="{% url 'list-event' item.classes.id %}">wydarzenia dla klasy</a>
                         </td>
                     </tr>
                 {% endfor %}

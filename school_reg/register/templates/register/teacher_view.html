@@ -7,13 +7,30 @@
         <hr class="my-4">
             <p class="lead">
                 <div class="d-flex justify-content-center flex-wrap">
-                    {% if educator %}
-                        <a class="btn btn-lg btn-info btn-main m-2" href="{% url 'class-details' educator.id %}" role="button">Klasa wychowawstwo</a>
-                    {% endif %}
-                    <a class="btn btn-lg btn-info btn-main m-2" href="{% url 'teacher-subjects-view' %}" role="button">Klasy zajecia</a>
-                    <a class="btn btn-lg btn-info btn-main m-2" href="{% url 'teacher-schedule' teacher.id %}" role="button">Plan zajęć</a>
-                    <a class="btn btn-lg btn-info btn-main m-2" href="{% url 'notices-teacher' %}" role="button">Uwagi</a>
-                    <a class="btn btn-lg btn-info btn-main m-2" href="{% url 'adverts-teacher' %}" role="button">Dodane ogloszenia</a>
+                    <table class="table">
+                        {% if educator %}
+                        <tr>
+                            <td colspan="2">
+                            <a class="link-panel btn btn-lg btn-info btn-main m-2"
+                               href="{% url 'class-details' educator.id %}" role="button">Klasa wychowawstwo</a>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <td colspan="2">
+                                <a class="link-panel btn btn-lg btn-info btn-main m-2"
+                                   href="{% url 'teacher-subjects-view' %}" role="button">Klasy zajecia</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><a class="link-panel btn btn-lg btn-info btn-main m-2" href="{% url 'list-teacher-event' %}" role="button">Zaplanowane wydarzenia</a></td>
+                            <td><a class="link-panel btn btn-lg btn-info btn-main m-2" href="{% url 'teacher-schedule' teacher.id %}" role="button">Plan zajęć</a></td>
+                        </tr>
+                        <tr>
+                            <td><a class="link-panel btn btn-lg btn-info btn-main m-2" href="{% url 'notices-teacher' %}" role="button">Uwagi</a></td>
+                            <td><a class="link-panel btn btn-lg btn-info btn-main m-2" href="{% url 'adverts-teacher' %}" role="button">Dodane ogloszenia</a></td>
+                        </tr>
+                    </table>
                 </div>
             </p>
     </div>

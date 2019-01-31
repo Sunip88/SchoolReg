@@ -6,11 +6,32 @@
         <h2>Panel ucznia</h2>
         <hr class="my-4">
             <p class="lead">
-            <div class="d-flex justify-content-center flex-wrap">
-                <a class="btn btn-lg btn-info btn-main m-2" href="{% url 'class-details' student_class.id %}" role="button">Klasa</a>
-                <a class="btn btn-lg btn-info btn-main m-2" href="{% url 'class-schedule' student_class.id %}" role="button">Plan zajęć</a>
-                <a class="btn btn-lg btn-info btn-main m-2" href="#" role="button">Kalendarz wydarzeń</a>
-            </div>
-        </p>
+                <div class="d-flex justify-content-center flex-wrap">
+                    <table class="table">
+                        <tr>
+                            <td colspan="2">
+                                <a class="link-panel btn btn-lg btn-info btn-main m-2"
+                                   href="{% url 'student-details' user.student.id %}" role="button">Twoje oceny</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <a class="link-panel btn btn-lg btn-info btn-main m-2"
+                                   href="{% url 'class-schedule' student_class.id %}" role="button">Plan zajęć</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <a class="link-panel btn btn-lg btn-info btn-main m-2"
+                                   href="{% url 'class-details' student_class.id %}" role="button">Klasa</a>
+                            </td>
+                            <td>
+                                <a class="link-panel btn btn-lg btn-info btn-main m-2"
+                                   href="{% url 'list-event' student_class.id %}" role="button">Wydarzenia</a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </p>
     </div>
 {% endblock content %}

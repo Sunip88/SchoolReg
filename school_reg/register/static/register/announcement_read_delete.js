@@ -1,5 +1,5 @@
 $(function () {
-    var delete_btn = $("#delete_btn");
+    var delete_btn = $(".delete_btn");
     delete_btn.on("click", function () {
         var deleted_art = $(this).parent().parent().parent();
         let data = $(this).data('one');
@@ -17,7 +17,7 @@ $(function () {
             });
 
     });
-    var read_btn = $("#read_btn");
+    var read_btn = $(".read_btn");
     read_btn.on("click", function () {
         var read_art = $(this).siblings("p");
         var read_btn = $(this)

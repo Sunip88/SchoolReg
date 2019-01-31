@@ -159,3 +159,12 @@ class Announcements(models.Model):
     date = models.DateField(auto_now_add=True)
     read = models.BooleanField(default=False)
     deleted = models.BooleanField(default=False)
+
+
+class Event(models.Model):
+    schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE)
+    date_set = models.DateField(auto_now_add=True)
+    date_of_event = models.DateField()
+    title = models.CharField(max_length=64)
+    text = models.TextField()
+    deleted = models.BooleanField(default=False)

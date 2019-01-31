@@ -15,6 +15,22 @@
                     </a>
                 </h4>
                 {% if user.profile.role == 2 %}
+                    {% if student.parent_set.all %}
+                    <h5>Rodzice:
+                        <ul>
+                        {% for parent in student.parent_set.all %}
+                            <li>{{ parent.user.first_name }} {{ parent.user.last_name }}
+                                {% if parent.user.email %}
+                                - {{ parent.user.email }}
+                                {% endif %}
+                                {% if parent.user.profile.phone %}
+                                 - {{ parent.user.profile.phone }}
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    </h5>
+                    {% endif %}
                     <a href="{% url 'add-notice' student.id %}">Dodaj uwagę</a>
                 {% endif %}
             </div>

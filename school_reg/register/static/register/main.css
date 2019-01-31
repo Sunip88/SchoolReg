@@ -86,3 +86,7 @@ a.article-title:hover {
 .table-inactive {
   background-color: #e3e3e3;
 }
+
+.link-panel {
+  display: block;
+}

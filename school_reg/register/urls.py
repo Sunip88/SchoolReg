@@ -4,7 +4,8 @@ from .views import MainView, ClassView, AddClassView, EditClassView, DetailsClas
     TeacherSubjectsClassesView, TeacherGradesView, StudentView, PresenceView, ScheduleClasses, \
     ScheduleTeacherView, ScheduleRoomView, SchedulesView, AdvertAddView, NoticeAddView, ParentPanelView, \
     NoticeParentView, NoticeTeacherView, AdvertClassAddView, AdvertTeacherView, AdvertClassEditView, AdvertEditView, \
-    NoticeEditView, NoticeParentEditView, AnnouncementView, TeacherDetailView, AnnouncementOnlineView
+    NoticeEditView, NoticeParentEditView, AnnouncementView, TeacherDetailView, AnnouncementOnlineView, AddEventView, \
+    ListEventView, EditEventView, ListEventTeacherView
 
 urlpatterns = [
     path("", MainView.as_view(), name="main"),
@@ -13,6 +14,10 @@ urlpatterns = [
     path("student_panel/", StudentView.as_view(), name="student-panel-view"),
     path("parent_panel/", ParentPanelView.as_view(), name="parent-panel-view"),
     path("teacher_subjects/", TeacherSubjectsClassesView.as_view(), name="teacher-subjects-view"),
+    path("add_events/<int:id_schedule>/", AddEventView.as_view(), name="add-event"),
+    path("edit_events/<int:id_event>/", EditEventView.as_view(), name="edit-event"),
+    path("list_events/<int:id_classes>/", ListEventView.as_view(), name="list-event"),
+    path("list_events_teacher/", ListEventTeacherView.as_view(), name="list-teacher-event"),
     path("subjects/", SubjectsView.as_view(), name="subject-view"),
     path("add_class/", AddClassView.as_view(), name='class-add'),
     path("add_subject/", AddSubjectView.as_view(), name='subject-add'),

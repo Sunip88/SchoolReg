@@ -1,0 +1,15 @@
+{% extends "register/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <h4>Dodaj wydarzenie dla:</h4>
+    <h5>przedmiotu {{ schedule.subject }} w klasie {{ schedule.classes }}</h5>
+    <form method="post">
+        {% csrf_token %}
+        <fieldset class="form-group">
+            {{ form|crispy }}
+        </fieldset>
+        <div class="form-group">
+            <button class="btn btn-outline-info" type="submit" name="button" value="form_btn">Zatwierdź</button>
+        </div>
+    </form>
+{% endblock content %}

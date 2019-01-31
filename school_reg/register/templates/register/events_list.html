@@ -1,0 +1,37 @@
+{% extends "register/main.html" %}
+{% load users.extras %}
+{% load static %}
+{% block js_load %}
+{#    <script src="{% static 'register/announcement_read_delete.js' %}" type="text/javascript"></script>#}
+{% endblock js_load %}
+{% block content %}
+    <h3 class="mb-3">Wydarzenia</h3>
+    {% if events %}
+        <table class="table">
+            <tr>
+                <th>Przedmiot</th>
+                <th>Data dodania</th>
+                <th>Termin</th>
+                <th>Treść</th>
+            </tr>
+            {% for event in events %}
+                {% if event.deleted == False %}
+            <tr>
+                <td>{{ event.schedule.subject.name }}</td>
+                <td>{{ event.date_set }}</td>
+                <td>{{ event.date_of_event }}</td>
+                {% if event.schedule.teacher == user.teacher %}
+                <td><b>{{ event.title }}</b><br>{{ event.text }}<br>
+                <a href="{% url 'edit-event' event.id %}">edytuj</a>
+                </td>
+                {% else %}
+                <td>{{ event.title }}<br>{{ event.text }}</td>
+                {% endif %}
+            </tr>
+                {% endif %}
+            {% endfor %}
+        </table>
+    {% else %}
+        <h4 class="mb-3">Brak wydarzeń</h4>
+    {% endif %}
+{% endblock content %}

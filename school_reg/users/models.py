@@ -16,7 +16,7 @@ class Profile(models.Model):
     image = models.ImageField(default='default.jpg', upload_to='profile_pics')
     role = models.IntegerField(choices=PROFILE_ROLE_CHOICES, default=0)
     temp_password = models.CharField(max_length=32)
-    # active = models.BooleanField(default=False)
+    phone = models.CharField(max_length=12, default='')
 
     def __str__(self):
         return f'{self.user.first_name}, {self.user.last_name} Profile'

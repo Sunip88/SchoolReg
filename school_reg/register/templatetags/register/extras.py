@@ -163,8 +163,12 @@ def check_week(schedule):
         now = datetime.now()
         now_week = now.weekday() + 1
         weekday = schedule.weekday
-        if weekday <= now_week:
+        if weekday < now_week:
+            return True
+        elif weekday == now_week:
             temp += 1
+        else:
+            return False
         start = datetime.combine(date.today(), schedule.hours.start_time)
         if now > start:
             temp += 1

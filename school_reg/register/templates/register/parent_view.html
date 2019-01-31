@@ -8,12 +8,34 @@
             <p class="lead">
                 <div class="d-flex justify-content-center flex-wrap">
                     {% if children %}
-                        <table>
+                        <table class="table">
                         {% for child in children %}
                             <tr>
-                            <td><a class="btn btn-lg btn-info btn-main m-2" href="{% url 'class-details' child.classes.id %}" role="button">Klasa {{ child.user.first_name }}</a></td>
-                            <td><a class="btn btn-lg btn-info btn-main m-2" href="{% url 'class-schedule' child.classes.id %}" role="button">Plan zajęć {{ child.user.first_name }}</a></td>
-                            <td><a class="btn btn-lg btn-info btn-main m-2" href="{% url 'notices-parent' child.id %}" role="button">Uwagi dla {{ child.user.first_name }}</a></td>
+                                <td>
+                                    <a class="link-panel btn btn-lg btn-info btn-main m-2"
+                                       href="{% url 'student-details' child.id %}"
+                                       role="button">Oceny {{ child.user.first_name }}</a>
+                                </td>
+                                <td>
+                                    <a class="link-panel btn btn-lg btn-info btn-main m-2"
+                                       href="{% url 'class-details' child.classes.id %}"
+                                       role="button">Klasa {{ child.user.first_name }}</a>
+                                </td>
+                                <td>
+                                    <a class="link-panel btn btn-lg btn-info btn-main m-2"
+                                       href="{% url 'class-schedule' child.classes.id %}"
+                                       role="button">Plan zajęć {{ child.user.first_name }}</a>
+                                </td>
+                                <td>
+                                    <a class="link-panel btn btn-lg btn-info btn-main m-2"
+                                       href="{% url 'notices-parent' child.id %}"
+                                       role="button">Uwagi dla {{ child.user.first_name }}</a>
+                                </td>
+                                <td>
+                                    <a class="link-panel btn btn-lg btn-info btn-main m-2"
+                                       href="{% url 'list-event' child.classes.id %}"
+                                       role="button">Wydarzenia dla {{ child.user.first_name }}</a>
+                                </td>
                             </tr>
                         {% endfor %}
                         </table>
