@@ -4,6 +4,12 @@ body {
   margin-top: 5rem;
 }
 
+
+a {
+  color: #208a06;
+}
+
+
 h1, h2, h3, h4, h5, h6 {
   color: #444444;
 }
@@ -13,7 +19,7 @@ ul {
 }
 
 .bg-steel {
-  background-color: #5f788a;
+  background-color: #208a06;
 }
 
 .site-header .navbar-nav .nav-link {
@@ -90,3 +96,32 @@ a.article-title:hover {
 .link-panel {
   display: block;
 }
+
+.btn-main {
+    color: #FFFFFF;
+    background-color: #208a06;
+    border-color: #1a6606;
+}
+
+.btn-main:hover {
+    color: #FFFFFF;
+    background-color: #1a6606;
+    border-color: #1a6606;
+}
+.btn-main:focus,
+.btn-main:active,
+.btn-main.active,
+.open .dropdown-toggle.btn-main {
+    color: #FFFFFF;
+    background-color: #208a06;
+    border-color: #1a6606;
+}
+
+.btn-outline-info {
+  border-color: #1a6606;
+  color: #208a06;
+}
+.btn-outline-info:hover {
+  background-color: #1a6606;
+}
+
