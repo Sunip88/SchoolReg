@@ -1,4 +1,6 @@
 from django import forms
+from django.forms import fields
+
 from .models import Grades, Adverts, Notice, AdvertsClass, Event
 
 
@@ -80,6 +82,8 @@ class EditNoticeForm(forms.ModelForm):
 
 
 class AddEventForm(forms.ModelForm):
+    date_of_event = fields.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
+
     class Meta:
         model = Event
         fields = ['title', 'text', 'date_of_event']

@@ -15,6 +15,9 @@
                     </a>
                 </h4>
                 {% if user.profile.role == 2 %}
+                    {% if student.user.email %}
+                    <h5>Email: {{ student.user.email }}</h5>
+                    {% endif %}
                     {% if student.parent_set.all %}
                     <h5>Rodzice:
                         <ul>

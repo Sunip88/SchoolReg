@@ -10,6 +10,14 @@ class UserTeacherRegisterForm(UserCreationForm):
     class Meta:
         model = User
         fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2']
+        labels = {
+            'username': 'login',
+            'first_name': 'imię',
+            'last_name': 'nazwisko',
+            'email': 'email',
+            'password1': 'haslo',
+            'password2': 'powtórz hasło',
+        }
 
 
 class ParentRegisterForm(forms.ModelForm):
@@ -28,12 +36,21 @@ class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'email']
+        labels = {
+            'first_name': 'imię',
+            'last_name': 'nazwisko',
+            'email': 'email',
+        }
 
 
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ['image', 'phone']
+        labels = {
+            'image': 'zdjęcie',
+            'phone': 'telefon',
+        }
 
 
 class UserParentStudentRegisterForm(forms.ModelForm):
@@ -41,6 +58,10 @@ class UserParentStudentRegisterForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['first_name', 'last_name']
+        labels = {
+            'first_name': 'imię',
+            'last_name': 'nazwisko',
+        }
 
 
 class StudentRegisterForm(forms.ModelForm):
@@ -48,9 +69,7 @@ class StudentRegisterForm(forms.ModelForm):
     class Meta:
         model = Student
         fields = ['year_of_birth', 'classes']
-
-
-class MessagesAddForm(forms.ModelForm):
-    class Meta:
-        model = Messages
-        fields = ['content', 'send_to']
+        labels = {
+            'year_of_birth': 'rok urodzenia',
+            'classes': 'klasa',
+        }

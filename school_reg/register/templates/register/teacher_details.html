@@ -9,6 +9,9 @@
                     Imie i nazwisko: {{ teacher.user.first_name }} {{ teacher.user.last_name }}
                 </h4>
                 <h4>Email: {{ teacher.user.email }}</h4>
+                {% if user.profile.role == 2 and teacher.user.profile.phone %}
+                    <h4>Telefon: {{ teacher.user.profile.phone }}</h4>
+                {% endif %}
                 {% if educator %}
                     {% for edu in educator %}
                         <h4>Wychowawca klasy: <a href="{% url 'class-details' edu.id %}">{{ edu.name }}</a></h4>

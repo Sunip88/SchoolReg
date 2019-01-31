@@ -2,17 +2,14 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views import View
-from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin, UserPassesTestMixin
-from django.urls import reverse_lazy
-from django.contrib.auth import views as auth_views, login, authenticate
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
+from django.contrib.auth import views as auth_views
 from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
-
-from users.models import Messages, Profile
+from users.models import Profile
 from .forms import UserTeacherRegisterForm, UserUpdateForm, ProfileUpdateForm, StudentRegisterForm, \
-    ParentRegisterForm, UserParentStudentRegisterForm, MessagesAddForm
-from register.models import Student, Teacher, Parent
-from django.forms import modelformset_factory
+    ParentRegisterForm, UserParentStudentRegisterForm
+from register.models import Teacher
 import uuid
 import random
 
@@ -134,27 +131,28 @@ class ProfileView(LoginRequiredMixin, View):
 
     def get(self, request):
         u_form = UserUpdateForm(instance=request.user)
-        p_form = ProfileUpdateForm(instance=request.user.profile)
+        if request.user.profile.role != 0:
+            p_form = ProfileUpdateForm(instance=request.user.profile)
         role = request.user.profile.role
-        if role == 0:
-            s_form = StudentRegisterForm(instance=request.user.student)
-            # user = Student.objects.get(user_id=request.user.id)
         return render(request, 'users/profile.html', locals())
 
     def post(self, request):
         u_form = UserUpdateForm(request.POST, instance=request.user)
-        p_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
+        if request.user.profile.role != 0:
+            p_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
         button = request.POST.get('button')
         if button == 'update':
-            if u_form.is_valid() and p_form.is_valid():
-                u_form.save()
-                p_form.save()
-                if request.user.profile.role == 0:
-                    s_form = StudentRegisterForm(request.POST, instance=request.user.student)
-                    if s_form.is_valid():
-                        s_form.save()
-                messages.success(request, f'Twoje konto zostało zmodyfikowane')
-                return redirect('profile')
+            if request.user.profile.role != 0:
+                if u_form.is_valid() and p_form.is_valid():
+                    u_form.save()
+                    p_form.save()
+                    messages.success(request, f'Twoje konto zostało zmodyfikowane')
+                    return redirect('profile')
+            else:
+                if u_form.is_valid():
+                    u_form.save()
+                    messages.success(request, f'Twoje konto zostało zmodyfikowane')
+                    return redirect('profile')
         elif button == 'change_password':
             return redirect("change-password")
 
