@@ -16,7 +16,7 @@ def grades_all(subject_id, student_id):
         grades_str.append(str(g.get_grade_display()))
         sum_grades += g.grade
     result.append(", ".join(grades_str))
-    result.append(str(sum_grades/grades.count()))
+    result.append(str(round(sum_grades/grades.count(), 2)))
     return result
 
 
@@ -122,7 +122,7 @@ def presence_by_subject(presence, subject):
     present = []
     not_present = []
     for pres in presence:
-        if pres.subject == subject:
+        if pres.subject.subject.name == subject.name:
             if pres.present:
                 present.append(pres)
             else:

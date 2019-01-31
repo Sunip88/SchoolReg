@@ -273,7 +273,7 @@ class StudentDetailView(LoginRequiredMixin, View):
         for g in grades:
             if g.subject.id not in subjects.keys():
                 subjects[g.subject.id] = g.subject.name
-        ctx = {'student': student, 'grades': grades, 'subjects': subjects, 'presence': presence,
+        ctx = {'student': student, 'grades': grades, 'subjects': subjects, 'presence_list': presence,
                'subject_all': subjects_all}
         return render(request, 'register/student_details.html', ctx)
 
@@ -726,7 +726,7 @@ class ListEventView(LoginRequiredMixin, View):
     def get(self, request, id_classes):
         date_now = datetime.now()
         classes = get_object_or_404(Classes, id=id_classes)
-        events = Event.objects.filter(date_of_event__gte=date_now, schedule__classes=classes)
+        events = Event.objects.filter(date_of_event__gte=date_now, schedule__classes=classes).order_by('date_of_event')
         return render(request, 'register/events_list.html', {'events': events})
 
 
@@ -735,7 +735,7 @@ class ListEventTeacherView(LoginRequiredMixin, UserPassesTestMixin, View):
     def get(self, request):
         date_now = datetime.now()
         teacher = Teacher.objects.get(user=request.user)
-        events = Event.objects.filter(date_of_event__gte=date_now, schedule__teacher=teacher)
+        events = Event.objects.filter(date_of_event__gte=date_now, schedule__teacher=teacher).order_by('date_of_event')
         return render(request, 'register/events_list.html', {'events': events})
 
     def test_func(self):

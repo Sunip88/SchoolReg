@@ -10,9 +10,9 @@
               <div class="media-body">
                 <div class="article-metadata">
                     <p class="mr-2">
-                        <a href="{% url 'teacher-details' advert.author.id %}">
-                                {{ advert.author.first_name }} {{ advert.author.last_name }}
-                            </a>
+                        <a href="{% url 'teacher-details' advert.author.teacher.id %}">
+                            {{ advert.author.first_name }} {{ advert.author.last_name }}
+                        </a>
                     {% if advert.author == request.user %}
                         <a href="{% url 'edit-advert' advert.id %}" class="float-right">Modyfikuj</a>
                     {% endif %}

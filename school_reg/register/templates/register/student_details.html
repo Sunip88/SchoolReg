@@ -52,7 +52,11 @@
                         {% for key, value in subjects.items %}
                         <tr>
                             {% grades_all key student.id as grades %}
+                            {% if user.profile.role == 2 %}
                             <td><a href="{% url 'class-details-grades' key student.classes.id %}">{{ value }}</a></td>
+                            {% else %}
+                            <td>{{ value }}</td>
+                            {% endif %}
                             <td>{{ grades.0 }}</td>
                             <td>{{ grades.1 }}</td>
                         </tr>
@@ -75,7 +79,7 @@
                         </tr>
                         {% for subject in subject_all %}
                         <tr>
-                            {% presence_by_subject presence subject as present %}
+                            {% presence_by_subject presence_list subject as present %}
                             <td>{{ subject }}</td>
                             <td>{{ present.0 }}</td>
                             <td>{{ present.1 }}</td>

@@ -35,10 +35,8 @@ class ParentRegisterForm(forms.ModelForm):
 class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email']
+        fields = ['email']
         labels = {
-            'first_name': 'imię',
-            'last_name': 'nazwisko',
             'email': 'email',
         }
 
