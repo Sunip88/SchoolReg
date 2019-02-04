@@ -9,7 +9,7 @@ from django.views.generic import CreateView, UpdateView
 from .forms import AddGradeForm, AddAdvertForm, AddNoticeForm, AnswerNoticeForm, AddClassAdvertForm, \
     EditAdvertForm, EditClassAdvertForm, EditNoticeForm, AddEventForm
 from .models import Classes, Subject, Student, GradeCategory, Teacher, PresenceList, WorkingHours, Schedule, WEEKDAYS, \
-    ClassRoom, Adverts, Parent, Notice, AdvertsClass, Announcements, Event
+    ClassRoom, Adverts, Parent, Notice, AdvertsClass, Announcements, Event, Lessons
 from django.contrib import messages
 
 weekdays = [
@@ -62,16 +62,16 @@ class TeacherSubjectsClassesView(LoginRequiredMixin, UserPassesTestMixin, View):
     def get(self, request):
         teacher = Teacher.objects.get(user_id=request.user.id)
         weekday_now = datetime.now().weekday()
-        schedule_all = Schedule.objects.filter(teacher=teacher)
+        schedule_all = Schedule.objects.filter(lesson__teacher=teacher)
         schedule_now = schedule_all.filter(weekday=weekday_now + 1)
         subjects = []
         temp = []
         if schedule_all:
             for item in schedule_all:
-                i = str(item.subject) + str(item.classes.name)
+                i = str(item.lesson.subject) + str(item.lesson.classes.name)
                 if i not in temp:
                     subjects.append(item)
-                    temp.append(str(item.subject) + str(item.classes.name))
+                    temp.append(str(item.lesson.subject) + str(item.lesson.classes.name))
         else:
             subjects = []
         ctx = {'teacher': teacher, 'subjects': subjects, 'schedule': schedule_all, 'weekday_now': weekday_now,
@@ -241,7 +241,7 @@ class AddGradesClass(LoginRequiredMixin, UserPassesTestMixin, View):
         return testing_func(self.request.user, 2)
 
     def my_test(self, subject, classes):
-        teacher = Schedule.objects.filter(classes=classes, subject=subject)
+        teacher = Lessons.objects.filter(classes=classes, subject=subject)
         if teacher:
             teacher = teacher.first().teacher
             if self.request.user.teacher == teacher:
@@ -303,15 +303,17 @@ class PresenceView(LoginRequiredMixin, UserPassesTestMixin, View):
         students = Student.objects.filter(classes_id=detail_class.id)
         schedule = get_object_or_404(Schedule, id=id_schedule)
         today = datetime.now().strftime('%Y-%m-%d')
-        if not self.my_test(schedule):
+        if not self.my_test(schedule.lesson):
             raise PermissionDenied
+        for i in students:
+            print(i)
         ctx = {'detail_class': detail_class, 'students': students, 'today': today, 'schedule': schedule}
         return render(request, 'register/presence_check.html', ctx)
 
     def post(self, request, id_class, id_schedule):
         detail_class = get_object_or_404(Classes, id=id_class)
         schedule = get_object_or_404(Schedule, id=id_schedule)
-        if not self.my_test(schedule):
+        if not self.my_test(schedule.lesson):
             raise PermissionDenied
         students = Student.objects.filter(classes_id=detail_class.id)
         today = datetime.now()
@@ -322,7 +324,7 @@ class PresenceView(LoginRequiredMixin, UserPassesTestMixin, View):
         for student in students:
             presence = PresenceList.objects.filter(student=student,
                                                    day=day,
-                                                   subject=schedule)
+                                                   schedule=schedule)
             if student.id in student_presence:
                 if len(presence) > 0:
                     presence = presence.first()
@@ -331,12 +333,12 @@ class PresenceView(LoginRequiredMixin, UserPassesTestMixin, View):
                 else:
                     PresenceList.objects.create(student=student,
                                                 day=day,
-                                                subject=schedule,
+                                                schedule=schedule,
                                                 present=True)
             else:
                 name = student.user.first_name
                 surname = student.user.last_name
-                text = f"{name} {surname} był nieobecny na {schedule.subject.name} w dniu {date_formated}"
+                text = f"{name} {surname} był nieobecny na {schedule.lesson.subject.name} w dniu {date_formated}"
                 if len(presence) > 0:
                     presence = presence.first()
                     if presence.present:
@@ -347,7 +349,7 @@ class PresenceView(LoginRequiredMixin, UserPassesTestMixin, View):
                 else:
                     PresenceList.objects.create(student=student,
                                                 day=day,
-                                                subject=schedule,
+                                                schedule=schedule,
                                                 present=False)
                     Announcements.objects.create(text=text,
                                                  user=student.user)
@@ -358,8 +360,8 @@ class PresenceView(LoginRequiredMixin, UserPassesTestMixin, View):
     def test_func(self):
         return testing_func(self.request.user, 2)
 
-    def my_test(self, schedule):
-        if self.request.user.teacher == schedule.teacher:
+    def my_test(self, lesson):
+        if self.request.user.teacher == lesson.teacher:
             return True
         return False
 
@@ -662,31 +664,31 @@ class AnnouncementOnlineView(LoginRequiredMixin, View):
 class AddEventView(LoginRequiredMixin, UserPassesTestMixin, View):
     class_form = AddEventForm
 
-    def get(self, request, id_schedule):
-        schedule = get_object_or_404(Schedule, id=id_schedule)
-        if not self.my_test(schedule):
+    def get(self, request, id_lesson):
+        lesson = get_object_or_404(Lessons, id=id_lesson)
+        if not self.my_test(lesson):
             raise PermissionDenied
         form = self.class_form()
-        return render(request, 'register/add_event.html', {'form': form, 'schedule': schedule})
+        return render(request, 'register/add_event.html', {'form': form, 'lesson': lesson})
 
-    def post(self, request, id_schedule):
-        schedule = get_object_or_404(Schedule, id=id_schedule)
-        if not self.my_test(schedule):
+    def post(self, request, id_lesson):
+        lesson = get_object_or_404(Lessons, id=id_lesson)
+        if not self.my_test(lesson):
             raise PermissionDenied
         form = self.class_form(request.POST)
         if form.is_valid():
             new_event = form.save(commit=False)
-            new_event.schedule = schedule
+            new_event.lesson = lesson
             new_event.save()
             messages.success(request, "Dodano wydarzenie")
             return redirect('teacher-subjects-view')
-        return render(request, 'register/add_event.html', {'form': form, 'schedule': schedule})
+        return render(request, 'register/add_event.html', {'form': form, 'lesson': lesson})
 
     def test_func(self):
         return testing_func(self.request.user, 2)
 
-    def my_test(self, schedule):
-        if schedule.teacher == self.request.user.teacher:
+    def my_test(self, lesson):
+        if lesson.teacher == self.request.user.teacher:
             return True
         return False
 
@@ -696,27 +698,27 @@ class EditEventView(LoginRequiredMixin, UserPassesTestMixin, View):
 
     def get(self, request, id_event):
         event = get_object_or_404(Event, id=id_event)
-        if not self.my_test(event):
+        if not self.my_test(event.lesson):
             raise PermissionDenied
         form = self.class_form(instance=event)
         return render(request, 'register/add_event.html', {'form': form, 'event': event})
 
     def post(self, request, id_event):
         event = get_object_or_404(Event, id=id_event)
-        if not self.my_test(event):
+        if not self.my_test(event.lesson):
             raise PermissionDenied
         form = self.class_form(request.POST, instance=event)
         if form.is_valid():
             form.save()
             messages.success(request, "Edytowano wydarzenie")
-            return redirect('list-event', id_classes=event.schedule.classes.id)
+            return redirect('list-event', id_classes=event.lesson.classes.id)
         return render(request, 'register/add_event.html', {'form': form, 'event': event})
 
     def test_func(self):
         return testing_func(self.request.user, 2)
 
-    def my_test(self, event):
-        if event.schedule.teacher == self.request.user.teacher:
+    def my_test(self, lesson):
+        if lesson.teacher == self.request.user.teacher:
             return True
         return False
 
@@ -726,7 +728,7 @@ class ListEventView(LoginRequiredMixin, View):
     def get(self, request, id_classes):
         date_now = datetime.now()
         classes = get_object_or_404(Classes, id=id_classes)
-        events = Event.objects.filter(date_of_event__gte=date_now, schedule__classes=classes).order_by('date_of_event')
+        events = Event.objects.filter(date_of_event__gte=date_now, lesson__classes=classes).order_by('date_of_event')
         return render(request, 'register/events_list.html', {'events': events})
 
 
@@ -735,7 +737,7 @@ class ListEventTeacherView(LoginRequiredMixin, UserPassesTestMixin, View):
     def get(self, request):
         date_now = datetime.now()
         teacher = Teacher.objects.get(user=request.user)
-        events = Event.objects.filter(date_of_event__gte=date_now, schedule__teacher=teacher).order_by('date_of_event')
+        events = Event.objects.filter(date_of_event__gte=date_now, lesson__teacher=teacher).order_by('date_of_event')
         return render(request, 'register/events_list.html', {'events': events})
 
     def test_func(self):

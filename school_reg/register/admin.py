@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import Classes, Subject, Student, Teacher, Parent, Grades, WorkingHours, Schedule, ClassRoom, PresenceList, \
-    GradeCategory, Adverts, AdvertsClass, Notice, Announcements, Event
+    GradeCategory, Adverts, AdvertsClass, Notice, Announcements, Event, Lessons
 
 
 @admin.register(Classes)
@@ -48,8 +48,14 @@ class MessagesAdmin(admin.ModelAdmin):
 
 @admin.register(Schedule)
 class MessagesAdmin(admin.ModelAdmin):
-    list_display = ['id', 'classes', 'subject', 'room', 'teacher', 'hours', 'weekday']
-    list_filter = ['classes', 'subject', 'room', 'teacher', 'hours', 'weekday']
+    list_display = ['id', 'room', 'hours', 'weekday', 'lesson']
+    list_filter = ['room', 'lesson', 'hours', 'weekday']
+
+
+@admin.register(Lessons)
+class MessagesAdmin(admin.ModelAdmin):
+    list_display = ['id', 'classes', 'subject', 'teacher']
+    list_filter = ['classes', 'subject', 'teacher']
 
 
 @admin.register(ClassRoom)
@@ -59,7 +65,7 @@ class MessagesAdmin(admin.ModelAdmin):
 
 @admin.register(PresenceList)
 class MessagesAdmin(admin.ModelAdmin):
-    list_display = ['id', 'student', 'day', 'present', 'subject']
+    list_display = ['id', 'student', 'day', 'present', 'schedule']
     list_filter = ['present']
 
 
@@ -107,6 +113,6 @@ class MessagesAdmin(admin.ModelAdmin):
 
 @admin.register(Event)
 class MessagesAdmin(admin.ModelAdmin):
-    list_display = ['id', 'schedule', 'date_set', 'date_of_event', 'title', content_display_thirty_signs, 'deleted']
+    list_display = ['id', 'lesson', 'date_set', 'date_of_event', 'title', content_display_thirty_signs, 'deleted']
     list_filter = ['date_of_event', 'deleted']
     actions = [deleted, ]

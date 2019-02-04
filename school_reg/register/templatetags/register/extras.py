@@ -45,7 +45,7 @@ def student_presence(student, subject):
 @register.filter()
 def student_presence_get(student, schedule):
     today = datetime.now().date()
-    presence = student.presencelist_set.filter(subject=schedule, day=today)
+    presence = student.presencelist_set.filter(schedule=schedule, day=today)
     if presence:
         presence = presence.first()
         return presence.present
@@ -78,10 +78,10 @@ def teacher_class_subject(subject, detail_class):
 def schedule_choice(classes, hours, weekday):
     h_start = hours.start_time
     h_end = hours.end_time
-    schedule = Schedule.objects.filter(classes_id=classes.id,
-                                       weekday=weekday[0],
+    schedule = Schedule.objects.filter(weekday=weekday[0],
                                        hours__start_time__exact=h_start,
-                                       hours__end_time__exact=h_end)
+                                       hours__end_time__exact=h_end,
+                                       lesson__classes=classes.id)
     if schedule:
         return schedule.first()
     else:
@@ -93,9 +93,9 @@ def schedule_choice_teacher(teacher, hours, weekday):
     h_start = hours.start_time
     h_end = hours.end_time
     schedule = Schedule.objects.filter(weekday=weekday[0],
-                                       teacher=teacher,
                                        hours__start_time__exact=h_start,
-                                       hours__end_time__exact=h_end)
+                                       hours__end_time__exact=h_end,
+                                       lesson__teacher=teacher)
     if schedule:
         return schedule.first()
     else:
@@ -122,7 +122,7 @@ def presence_by_subject(presence, subject):
     present = []
     not_present = []
     for pres in presence:
-        if pres.subject.subject.name == subject.name:
+        if pres.schedule.lesson.subject.name == subject.name:
             if pres.present:
                 present.append(pres)
             else:

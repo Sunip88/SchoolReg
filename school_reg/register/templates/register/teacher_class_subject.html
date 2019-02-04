@@ -21,16 +21,16 @@
                     <tr class="table-inactive">
                         {% endif %}
                         <td>
-                            <a class="mr-2" href="{% url 'class-details-grades' item.subject.id item.classes.id %}">
-                                {{ item.subject.name }} {{ item.classes.name }} - {{ item.classes.educator }}
+                            <a class="mr-2" href="{% url 'class-details-grades' item.lesson.subject.id item.lesson.classes.id %}">
+                                {{ item.lesson.subject.name }} {{ item.lesson.classes.name }} - {{ item.lesson.classes.educator }}
                             </a>
                         </td>
                         <td id="timer-data" >{{ item.hours.start_time|date:"H:i" }}</td>
                         <td>
-                            <a class="mr-2" href="{% url 'class-grade-add' item.classes.id item.subject.id %}">Dodawanie Ocen</a>
+                            <a class="mr-2" href="{% url 'class-grade-add' item.lesson.classes.id item.lesson.subject.id %}">Dodawanie Ocen</a>
                         </td>
                         <td>
-                            <a class="mr-2" href="{% url 'class-presence-add' item.classes.id item.id %}">
+                            <a class="mr-2" href="{% url 'class-presence-add' item.lesson.classes.id item.id %}">
                                 Sprawdzenie obecności
                             </a>
                         </td>
@@ -59,15 +59,15 @@
                   {% for item in subjects %}
                     <tr>
                         <td>
-                            <a class="mr-2" href="{% url 'class-details-grades' item.subject.id item.classes.id %}">
-                                {{ item.subject.name }} {{ item.classes.name }} - {{ item.classes.educator }}
+                            <a class="mr-2" href="{% url 'class-details-grades' item.lesson.subject.id item.lesson.classes.id %}">
+                                {{ item.lesson.subject.name }} {{ item.lesson.classes.name }} - {{ item.lesson.classes.educator }}
                             </a>
                         </td>
                         <td>
-                            <a class="mr-2" href="{% url 'class-grade-add' item.classes.id item.subject.id %}">Dodawanie Ocen</a>
+                            <a class="mr-2" href="{% url 'class-grade-add' item.lesson.classes.id item.lesson.subject.id %}">Dodawanie Ocen</a>
                         </td>
                         <td>
-                            <a class="mr-2" href="{% url 'list-event' item.classes.id %}">wydarzenia dla klasy</a>
+                            <a class="mr-2" href="{% url 'list-event' item.lesson.classes.id %}">wydarzenia dla klasy</a>
                         </td>
                     </tr>
                 {% endfor %}
