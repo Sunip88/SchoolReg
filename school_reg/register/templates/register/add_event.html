@@ -2,7 +2,7 @@
 {% load crispy_forms_tags %}
 {% block content %}
     <h4>Dodaj wydarzenie dla:</h4>
-    <h5>przedmiotu {{ schedule.subject }} w klasie {{ schedule.classes }}</h5>
+    <h5>przedmiotu {{ lesson.subject }} w klasie {{ lesson.classes }}</h5>
     <form method="post">
         {% csrf_token %}
         <fieldset class="form-group">

@@ -17,7 +17,7 @@
             {% for event in events %}
                 {% if event.deleted == False %}
             <tr>
-                <td>{{ event.schedule.subject.name }}</td>
+                <td>{{ event.lesson.subject.name }}</td>
                 <td>{{ event.date_set }}</td>
                 <td>{{ event.date_of_event }}</td>
                 {% if event.schedule.teacher == user.teacher %}

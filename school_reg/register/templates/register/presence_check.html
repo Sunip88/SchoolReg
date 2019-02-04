@@ -14,7 +14,7 @@
                         {{ detail_class.educator }}</a></h4>
                     <h4>Przedmiot: {{ schedule.subject.name }}
                     </h4>
-                    {% teacher_class_subject schedule.subject detail_class as teacher %}
+                    {% teacher_class_subject schedule.lesson.subject detail_class as teacher %}
                     <h4>Nauczyciel przedmiotu: {{ teacher }}</h4>
                     <h5>Dzisiaj: {{ today }}</h5>
                 </div>

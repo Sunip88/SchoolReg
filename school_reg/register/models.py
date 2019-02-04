@@ -95,7 +95,7 @@ class PresenceList(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     day = models.DateField()
     present = models.NullBooleanField()
-    subject = models.ForeignKey('register.Schedule', on_delete=models.CASCADE)
+    schedule = models.ForeignKey('register.Schedule', on_delete=models.CASCADE)
 
 
 class ClassRoom(models.Model):
@@ -114,16 +114,23 @@ class WorkingHours(models.Model):
         return f"{self.start_time} - {self.end_time}"
 
 
-class Schedule(models.Model):
+class Lessons(models.Model):
     classes = models.ForeignKey(Classes, on_delete=models.CASCADE)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
-    room = models.ForeignKey(ClassRoom, on_delete=models.CASCADE)
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.classes.name} - {self.subject.name} - {self.teacher.user.last_name}"
+
+
+class Schedule(models.Model):
+    lesson = models.ForeignKey(Lessons, on_delete=models.CASCADE)
+    room = models.ForeignKey(ClassRoom, on_delete=models.CASCADE)
     hours = models.ForeignKey(WorkingHours, on_delete=models.CASCADE)
     weekday = models.IntegerField(choices=WEEKDAYS)
 
     def __str__(self):
-        return f"{self.classes.name} - {self.subject.name} - {self.teacher.user.last_name} - {self.room}"
+        return f"{self.lesson} - {self.room}"
 
 
 class Adverts(models.Model):
@@ -162,7 +169,7 @@ class Announcements(models.Model):
 
 
 class Event(models.Model):
-    schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE)
+    lesson = models.ForeignKey(Lessons, on_delete=models.CASCADE)
     date_set = models.DateField(auto_now_add=True)
     date_of_event = models.DateField()
     title = models.CharField(max_length=64)
