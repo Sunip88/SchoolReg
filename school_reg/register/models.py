@@ -50,7 +50,6 @@ class Subject(models.Model):
 
 class Teacher(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    subjects = models.ManyToManyField(Subject)
 
     def __str__(self):
         return f'{self.user.first_name} {self.user.last_name}'
