@@ -66,7 +66,7 @@ def grades_category_subject(student, category, subject):
 
 @register.simple_tag
 def teacher_class_subject(subject, detail_class):
-    teachers = Teacher.objects.filter(subjects=subject.id, subjects__classes=detail_class)
+    teachers = Teacher.objects.filter(classes__lessons__subject=subject, classes=detail_class)
     if teachers:
         result = teachers.first()
     else:

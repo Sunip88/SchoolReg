@@ -50,7 +50,6 @@ class Subject(models.Model):
 
 class Teacher(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    subjects = models.ManyToManyField(Subject)
 
     def __str__(self):
         return f'{self.user.first_name} {self.user.last_name}'
@@ -96,6 +95,9 @@ class PresenceList(models.Model):
     day = models.DateField()
     present = models.NullBooleanField()
     schedule = models.ForeignKey('register.Schedule', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.student} - {self.day} - {self.present}'
 
 
 class ClassRoom(models.Model):
