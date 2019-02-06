@@ -96,6 +96,9 @@ class PresenceList(models.Model):
     present = models.NullBooleanField()
     schedule = models.ForeignKey('register.Schedule', on_delete=models.CASCADE)
 
+    def __str__(self):
+        return f'{self.student} - {self.day} - {self.present}'
+
 
 class ClassRoom(models.Model):
     name = models.CharField(max_length=16)
