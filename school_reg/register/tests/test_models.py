@@ -1,9 +1,10 @@
+from PIL import Image
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 from datetime import datetime
 from register.models import Subject, Teacher, Classes, Student, Parent, GradeCategory, Grades, Lessons, ClassRoom, \
-    WorkingHours, Schedule, PresenceList
+    WorkingHours, Schedule, PresenceList, Adverts, AdvertsClass, Notice, Announcements, Event
 from users.models import Profile
 
 
@@ -20,32 +21,32 @@ class ClassModelTest(TestCase):
         Classes.objects.create(educator=teacher, name='1a', description='test')
 
     def test_educator_label(self):
-        classes = Classes.objects.get(id=1)
+        classes = Classes.objects.all().first()
         field_label = classes._meta.get_field('educator').verbose_name
         self.assertEqual(field_label, 'educator')
 
     def test_name_label(self):
-        classes = Classes.objects.get(id=1)
+        classes = Classes.objects.all().first()
         field_label = classes._meta.get_field('name').verbose_name
         self.assertEqual(field_label, 'name')
 
     def test_description_label(self):
-        classes = Classes.objects.get(id=1)
+        classes = Classes.objects.all().first()
         field_label = classes._meta.get_field('description').verbose_name
         self.assertEqual(field_label, 'description')
 
     def test_name_max_lenght(self):
-        classes = Classes.objects.get(id=1)
+        classes = Classes.objects.all().first()
         max_length = classes._meta.get_field('name').max_length
         self.assertEqual(max_length, 32)
 
     def test_description_max_lenght(self):
-        classes = Classes.objects.get(id=1)
+        classes = Classes.objects.all().first()
         max_length = classes._meta.get_field('description').max_length
         self.assertEqual(max_length, 512)
 
     def test_object_name_is_name(self):
-        classes = Classes.objects.get(id=1)
+        classes = Classes.objects.all().first()
         expected_object_name = f'{classes.name}'
         self.assertEqual(expected_object_name, str(classes))
 
@@ -439,3 +440,307 @@ class ScheduleModelTest(TestCase):
         schedule = Schedule.objects.all().first()
         expected_object_name = f'{schedule.lesson.classes.name} - {schedule.lesson.subject.name} - {schedule.lesson.teacher.user.last_name} - {schedule.room.name}'
         self.assertEqual(expected_object_name, str(schedule))
+
+
+class AdvertsModelTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        user = User.objects.create(username='testuser',
+                                   email='a@a.com',
+                                   password='testpassword',
+                                   first_name='testing',
+                                   last_name='user')
+        user.profile.role = 2
+        Adverts.objects.create(text="testing text field",
+                               title='Title of test object',
+                               author=user)
+
+    def test_text_label(self):
+        adverts = Adverts.objects.all().first()
+        field_label = adverts._meta.get_field('text').verbose_name
+        self.assertEqual(field_label, 'text')
+
+    def test_title_label(self):
+        adverts = Adverts.objects.all().first()
+        field_label = adverts._meta.get_field('title').verbose_name
+        self.assertEqual(field_label, 'title')
+
+    def test_date_label(self):
+        adverts = Adverts.objects.all().first()
+        field_label = adverts._meta.get_field('date').verbose_name
+        self.assertEqual(field_label, 'date')
+
+    def test_author_label(self):
+        adverts = Adverts.objects.all().first()
+        field_label = adverts._meta.get_field('author').verbose_name
+        self.assertEqual(field_label, 'author')
+
+    def test_deleted_label(self):
+        adverts = Adverts.objects.all().first()
+        field_label = adverts._meta.get_field('deleted').verbose_name
+        self.assertEqual(field_label, 'deleted')
+
+    def test_name_max_lenght(self):
+        adverts = Adverts.objects.all().first()
+        max_length = adverts._meta.get_field('title').max_length
+        self.assertEqual(max_length, 64)
+
+
+class AdvertsClassModelTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        user = User.objects.create(username='testuser',
+                                   email='a@a.com',
+                                   password='testpassword',
+                                   first_name='testing',
+                                   last_name='user')
+        user.profile.role = 2
+        teacher = Teacher.objects.create(user=user)
+        classes_new = Classes.objects.create(educator=teacher, name='1a', description='test')
+        AdvertsClass.objects.create(text="testing text field",
+                                    title='Title of test object',
+                                    author=teacher,
+                                    classes=classes_new)
+
+    def test_text_label(self):
+        adverts = AdvertsClass.objects.all().first()
+        field_label = adverts._meta.get_field('text').verbose_name
+        self.assertEqual(field_label, 'text')
+
+    def test_title_label(self):
+        adverts = AdvertsClass.objects.all().first()
+        field_label = adverts._meta.get_field('title').verbose_name
+        self.assertEqual(field_label, 'title')
+
+    def test_date_label(self):
+        adverts = AdvertsClass.objects.all().first()
+        field_label = adverts._meta.get_field('date').verbose_name
+        self.assertEqual(field_label, 'date')
+
+    def test_author_label(self):
+        adverts = AdvertsClass.objects.all().first()
+        field_label = adverts._meta.get_field('author').verbose_name
+        self.assertEqual(field_label, 'author')
+
+    def test_deleted_label(self):
+        adverts = AdvertsClass.objects.all().first()
+        field_label = adverts._meta.get_field('deleted').verbose_name
+        self.assertEqual(field_label, 'deleted')
+
+    def test_classes_label(self):
+        adverts = AdvertsClass.objects.all().first()
+        field_label = adverts._meta.get_field('classes').verbose_name
+        self.assertEqual(field_label, 'classes')
+
+    def test_title_max_lenght(self):
+        adverts = AdvertsClass.objects.all().first()
+        max_length = adverts._meta.get_field('title').max_length
+        self.assertEqual(max_length, 64)
+
+
+class NoticeModelTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        user = User.objects.create(username='testuser',
+                                   email='a@a.com',
+                                   password='testpassword',
+                                   first_name='testing',
+                                   last_name='user')
+        user.profile.role = 2
+        teacher = Teacher.objects.create(user=user)
+        classes_new = Classes.objects.create(educator=teacher, name='1a', description='test')
+        user2 = User.objects.create(username='testuser_student',
+                                    email='a@a.com',
+                                    password='testpassword',
+                                    first_name='testing_student',
+                                    last_name='user_student')
+        user2.profile.role = 0
+        student = Student.objects.create(year_of_birth=2000, classes=classes_new, user=user2)
+        Notice.objects.create(text="testing text field",
+                              from_user=teacher,
+                              to_user=student,
+                              accepted=False)
+
+    def test_text_label(self):
+        notice = Notice.objects.all().first()
+        field_label = notice._meta.get_field('text').verbose_name
+        self.assertEqual(field_label, 'text')
+
+    def test_from_user_label(self):
+        notice = Notice.objects.all().first()
+        field_label = notice._meta.get_field('from_user').verbose_name
+        self.assertEqual(field_label, 'from user')
+
+    def test_to_user_label(self):
+        notice = Notice.objects.all().first()
+        field_label = notice._meta.get_field('to_user').verbose_name
+        self.assertEqual(field_label, 'to user')
+
+    def test_accepted_label(self):
+        notice = Notice.objects.all().first()
+        field_label = notice._meta.get_field('accepted').verbose_name
+        self.assertEqual(field_label, 'accepted')
+
+    def test_re_text_label(self):
+        notice = Notice.objects.all().first()
+        field_label = notice._meta.get_field('re_text').verbose_name
+        self.assertEqual(field_label, 're text')
+
+    def test_date_label(self):
+        notice = Notice.objects.all().first()
+        field_label = notice._meta.get_field('date').verbose_name
+        self.assertEqual(field_label, 'date')
+
+    def test_deleted_label(self):
+        notice = Notice.objects.all().first()
+        field_label = notice._meta.get_field('deleted').verbose_name
+        self.assertEqual(field_label, 'deleted')
+
+    def test_text_max_lenght(self):
+        notice = Notice.objects.all().first()
+        max_length = notice._meta.get_field('text').max_length
+        self.assertEqual(max_length, 256)
+
+    def test_re_text_max_lenght(self):
+        notice = Notice.objects.all().first()
+        max_length = notice._meta.get_field('re_text').max_length
+        self.assertEqual(max_length, 256)
+
+
+class AnnouncementsModelTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        user = User.objects.create(username='testuser',
+                                   email='a@a.com',
+                                   password='testpassword',
+                                   first_name='testing',
+                                   last_name='user')
+        user.profile.role = 2
+        Announcements.objects.create(text="testing text field",
+                                     user=user)
+
+    def test_text_label(self):
+        announcement = Announcements.objects.all().first()
+        field_label = announcement._meta.get_field('text').verbose_name
+        self.assertEqual(field_label, 'text')
+
+    def test_user_label(self):
+        announcement = Announcements.objects.all().first()
+        field_label = announcement._meta.get_field('user').verbose_name
+        self.assertEqual(field_label, 'user')
+
+    def test_date_label(self):
+        announcement = Announcements.objects.all().first()
+        field_label = announcement._meta.get_field('date').verbose_name
+        self.assertEqual(field_label, 'date')
+
+    def test_read_label(self):
+        announcement = Announcements.objects.all().first()
+        field_label = announcement._meta.get_field('read').verbose_name
+        self.assertEqual(field_label, 'read')
+
+    def test_deleted_label(self):
+        announcement = Announcements.objects.all().first()
+        field_label = announcement._meta.get_field('deleted').verbose_name
+        self.assertEqual(field_label, 'deleted')
+
+
+class EventModelTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        user = User.objects.create(username='testuser',
+                                   email='a@a.com',
+                                   password='testpassword',
+                                   first_name='testing',
+                                   last_name='user')
+        user.profile.role = 2
+        teacher = Teacher.objects.create(user=user)
+        classes_new = Classes.objects.create(educator=teacher, name='1a', description='test')
+        subject = Subject.objects.create(name='testSubject')
+        subject.classes.add(classes_new)
+        subject.save()
+        lesson = Lessons.objects.create(classes=classes_new, subject=subject, teacher=teacher)
+        date_date = datetime(int(2019), int(2), int(4)).date()
+        Event.objects.create(lesson=lesson, date_of_event=date_date, title="Title test", text="testing context")
+
+    def test_lesson_label(self):
+        event = Event.objects.all().first()
+        field_label = event._meta.get_field('lesson').verbose_name
+        self.assertEqual(field_label, 'lesson')
+
+    def test_date_set_label(self):
+        event = Event.objects.all().first()
+        field_label = event._meta.get_field('date_set').verbose_name
+        self.assertEqual(field_label, 'date set')
+
+    def test_date_of_event_label(self):
+        event = Event.objects.all().first()
+        field_label = event._meta.get_field('date_of_event').verbose_name
+        self.assertEqual(field_label, 'date of event')
+
+    def test_title_label(self):
+        event = Event.objects.all().first()
+        field_label = event._meta.get_field('title').verbose_name
+        self.assertEqual(field_label, 'title')
+
+    def test_text_label(self):
+        event = Event.objects.all().first()
+        field_label = event._meta.get_field('text').verbose_name
+        self.assertEqual(field_label, 'text')
+
+    def test_deleted_label(self):
+        event = Event.objects.all().first()
+        field_label = event._meta.get_field('deleted').verbose_name
+        self.assertEqual(field_label, 'deleted')
+
+
+class ProfileModelTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        user = User.objects.create(username='testuser',
+                                   email='a@a.com',
+                                   password='testpassword',
+                                   first_name='testing',
+                                   last_name='user')
+        user.profile.role = 2
+
+    def test_user_label(self):
+        profile = Profile.objects.all().first()
+        field_label = profile._meta.get_field('user').verbose_name
+        self.assertEqual(field_label, 'user')
+
+    def test_image_label(self):
+        profile = Profile.objects.all().first()
+        field_label = profile._meta.get_field('image').verbose_name
+        self.assertEqual(field_label, 'image')
+
+    def test_role_label(self):
+        profile = Profile.objects.all().first()
+        field_label = profile._meta.get_field('role').verbose_name
+        self.assertEqual(field_label, 'role')
+
+    def test_temp_password_label(self):
+        profile = Profile.objects.all().first()
+        field_label = profile._meta.get_field('temp_password').verbose_name
+        self.assertEqual(field_label, 'temp password')
+
+    def test_phone_label(self):
+        profile = Profile.objects.all().first()
+        field_label = profile._meta.get_field('phone').verbose_name
+        self.assertEqual(field_label, 'phone')
+
+    def test_temp_password_max_lenght(self):
+        profile = Profile.objects.all().first()
+        max_length = profile._meta.get_field('temp_password').max_length
+        self.assertEqual(max_length, 32)
+
+    def test_object_name_is_user_first_last_name(self):
+        profile = Profile.objects.all().first()
+        expected_object_name = f'{profile.user.first_name}, {profile.user.last_name} Profile'
+        self.assertEqual(expected_object_name, str(profile))
+
+    def test_image_size(self):
+        profile = Profile.objects.all().first()
+        img = Image.open(profile.image.path)
+        self.assertEqual(img.height, 300)
+        self.assertEqual(img.width, 300)
