@@ -8,6 +8,10 @@ class AddGradeForm(forms.ModelForm):
     class Meta:
         model = Grades
         fields = ['category', 'grade']
+        labels = {
+            'category': 'kategoria',
+            'grade': 'ocena'
+        }
 
 
 class AddAdvertForm(forms.ModelForm):
@@ -18,6 +22,10 @@ class AddAdvertForm(forms.ModelForm):
             'title': 'tytuł',
             'text': 'treść',
         }
+        help_texts = {
+            'title': 'Podaj tytuł ogłoszenia',
+            'text': 'Podaj treść ogłoszenia'
+        }
 
 
 class AddClassAdvertForm(forms.ModelForm):
@@ -27,6 +35,10 @@ class AddClassAdvertForm(forms.ModelForm):
         labels = {
             'title': 'tytuł',
             'text': 'treść',
+        }
+        help_texts = {
+            'title': 'Podaj tytuł ogłoszenia klasowego',
+            'text': 'Podaj treść ogłoszenia klasowego'
         }
 
 
@@ -39,6 +51,10 @@ class EditAdvertForm(forms.ModelForm):
             'text': 'treść',
             'deleted': 'oznaczyć jako usunięte',
         }
+        help_texts = {
+            'title': 'Zmień tytuł ogłoszenia',
+            'text': 'Zmień treść ogłoszenia'
+        }
 
 
 class EditClassAdvertForm(forms.ModelForm):
@@ -50,6 +66,10 @@ class EditClassAdvertForm(forms.ModelForm):
             'text': 'treść',
             'deleted': 'oznaczyć jako usunięte',
         }
+        help_texts = {
+            'title': 'Zmień tytuł ogłoszenia klasowego',
+            'text': 'Zmień treść ogłoszenia klasowego'
+        }
 
 
 class AddNoticeForm(forms.ModelForm):
@@ -57,7 +77,10 @@ class AddNoticeForm(forms.ModelForm):
         model = Notice
         fields = ['text']
         labels = {
-            'text': 'treść uwagi',
+            'text': 'treść',
+        }
+        help_texts = {
+            'text': 'Podaj treść uwagi'
         }
 
 
@@ -67,7 +90,10 @@ class AnswerNoticeForm(forms.ModelForm):
         fields = ['accepted', 're_text']
         labels = {
             'accepted': 'przyjęte do wiadomości',
-            're_text': 'opcjonalny komentarz',
+            're_text': 'treść',
+        }
+        help_texts = {
+            're_text': 'Podaj treść komentarza'
         }
 
 
@@ -76,8 +102,11 @@ class EditNoticeForm(forms.ModelForm):
         model = Notice
         fields = ['text', 'deleted']
         labels = {
-            'text': 'treść uwagi',
+            'text': 'treść',
             'deleted': 'oznaczyć jako usunięte',
+        }
+        help_texts = {
+            'text': 'Zmień treść uwagi'
         }
 
 
@@ -91,4 +120,8 @@ class AddEventForm(forms.ModelForm):
             'title': 'tytuł',
             'text': 'opis',
             'date_of_event': 'termin wykonania',
+        }
+        help_texts = {
+            'title': 'Podaj tytuł wydarzenia',
+            'text': 'Podaj treść wydarzenia',
         }
