@@ -1,6 +1,8 @@
 from django.test import TestCase
 from register.forms import AddGradeForm, AddAdvertForm, AddClassAdvertForm, EditAdvertForm, EditClassAdvertForm, \
     AddNoticeForm, AnswerNoticeForm, EditNoticeForm, AddEventForm
+from users.forms import UserTeacherRegisterForm, ParentRegisterForm, UserUpdateForm, ProfileUpdateForm, \
+    UserParentStudentRegisterForm, StudentRegisterForm
 
 
 class AddGradeFormTest(TestCase):
@@ -103,3 +105,72 @@ class AddEventFormTest(TestCase):
         form = AddEventForm()
         self.assertEqual(form.fields['title'].help_text, 'Podaj tytuł wydarzenia')
         self.assertEqual(form.fields['text'].help_text, 'Podaj treść wydarzenia')
+
+
+class UserTeacherRegisterFormTest(TestCase):
+    def test_fields_label(self):
+        form = UserTeacherRegisterForm()
+        self.assertTrue(form.fields['username'].label is None or form.fields['username'].label == 'login')
+        self.assertTrue(form.fields['first_name'].label is None or form.fields['first_name'].label == 'imię')
+        self.assertTrue(form.fields['last_name'].label is None or form.fields['last_name'].label == 'nazwisko')
+        self.assertTrue(form.fields['email'].label is None or form.fields['email'].label == 'email')
+        self.assertTrue(form.fields['password1'].label is None or form.fields['password1'].label == 'Password')
+        self.assertTrue(form.fields['password2'].label is None or form.fields['password2'].label == 'Password confirmation')
+
+    def test_fields_help_text(self):
+        form = UserTeacherRegisterForm()
+        self.assertEqual(form.fields['username'].help_text, 'Podaj nazwę użytkownika')
+        self.assertEqual(form.fields['first_name'].help_text, 'Podaj imię użytkownika')
+        self.assertEqual(form.fields['last_name'].help_text, 'Podaj nazwisko użytkownika')
+        self.assertEqual(form.fields['email'].help_text, 'Podaj email użytkownika')
+
+
+class ParentRegisterFormTest(TestCase):
+    def test_fields_label(self):
+        form = ParentRegisterForm()
+        self.assertTrue(form.fields['students'].label is None or form.fields['students'].label == 'dzieci')
+
+
+class UserUpdateFormTest(TestCase):
+    def test_fields_label(self):
+        form = UserUpdateForm()
+        self.assertTrue(form.fields['email'].label is None or form.fields['email'].label == 'email')
+
+    def test_fields_help_text(self):
+        form = UserUpdateForm()
+        self.assertEqual(form.fields['email'].help_text, 'Podaj nowy email')
+
+
+class ProfileUpdateFormTest(TestCase):
+    def test_fields_label(self):
+        form = ProfileUpdateForm()
+        self.assertTrue(form.fields['image'].label is None or form.fields['image'].label == 'zdjęcie')
+        self.assertTrue(form.fields['phone'].label is None or form.fields['phone'].label == 'telefon')
+
+    def test_fields_help_text(self):
+        form = ProfileUpdateForm()
+        self.assertEqual(form.fields['image'].help_text, 'Podaj nowe zdjęcie')
+        self.assertEqual(form.fields['phone'].help_text, 'Podaj nowy telefon')
+
+
+class UserParentStudentRegisterFormTest(TestCase):
+    def test_fields_label(self):
+        form = UserParentStudentRegisterForm()
+        self.assertTrue(form.fields['first_name'].label is None or form.fields['first_name'].label == 'imię')
+        self.assertTrue(form.fields['last_name'].label is None or form.fields['last_name'].label == 'nazwisko')
+
+    def test_fields_help_text(self):
+        form = UserParentStudentRegisterForm()
+        self.assertEqual(form.fields['first_name'].help_text, 'Podaj imię użytkownika')
+        self.assertEqual(form.fields['last_name'].help_text, 'Podaj nazwisko użytkownika')
+
+
+class StudentRegisterFormTest(TestCase):
+    def test_fields_label(self):
+        form = StudentRegisterForm()
+        self.assertTrue(form.fields['year_of_birth'].label is None or form.fields['year_of_birth'].label == 'rok urodzenia')
+        self.assertTrue(form.fields['classes'].label is None or form.fields['classes'].label == 'klasa')
+
+    def test_fields_help_text(self):
+        form = StudentRegisterForm()
+        self.assertEqual(form.fields['year_of_birth'].help_text, 'Podaj rok urodzenia użytkownika')

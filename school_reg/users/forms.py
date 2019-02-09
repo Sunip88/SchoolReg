@@ -15,8 +15,12 @@ class UserTeacherRegisterForm(UserCreationForm):
             'first_name': 'imię',
             'last_name': 'nazwisko',
             'email': 'email',
-            'password1': 'haslo',
-            'password2': 'powtórz hasło',
+        }
+        help_texts = {
+            'username': 'Podaj nazwę użytkownika',
+            'first_name': 'Podaj imię użytkownika',
+            'last_name': 'Podaj nazwisko użytkownika',
+            'email': 'Podaj email użytkownika',
         }
 
 
@@ -29,6 +33,7 @@ class ParentRegisterForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ParentRegisterForm, self).__init__(*args, **kwargs)
         self.fields['students'].required = False
+        self.fields['students'].label = 'dzieci'
         self.fields['students'].widget = forms.CheckboxSelectMultiple()
 
 
@@ -37,7 +42,10 @@ class UserUpdateForm(forms.ModelForm):
         model = User
         fields = ['email']
         labels = {
-            'email': 'email',
+            'email': 'email'
+        }
+        help_texts = {
+            'email': 'Podaj nowy email',
         }
 
 
@@ -48,6 +56,10 @@ class ProfileUpdateForm(forms.ModelForm):
         labels = {
             'image': 'zdjęcie',
             'phone': 'telefon',
+        }
+        help_texts = {
+            'image': 'Podaj nowe zdjęcie',
+            'phone': 'Podaj nowy telefon',
         }
 
 
@@ -60,6 +72,10 @@ class UserParentStudentRegisterForm(forms.ModelForm):
             'first_name': 'imię',
             'last_name': 'nazwisko',
         }
+        help_texts = {
+            'first_name': 'Podaj imię użytkownika',
+            'last_name': 'Podaj nazwisko użytkownika',
+        }
 
 
 class StudentRegisterForm(forms.ModelForm):
@@ -70,4 +86,7 @@ class StudentRegisterForm(forms.ModelForm):
         labels = {
             'year_of_birth': 'rok urodzenia',
             'classes': 'klasa',
+        }
+        help_texts = {
+            'year_of_birth': 'Podaj rok urodzenia użytkownika',
         }
