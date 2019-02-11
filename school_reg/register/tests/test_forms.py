@@ -3,6 +3,9 @@ from register.forms import AddGradeForm, AddAdvertForm, AddClassAdvertForm, Edit
     AddNoticeForm, AnswerNoticeForm, EditNoticeForm, AddEventForm
 from users.forms import UserTeacherRegisterForm, ParentRegisterForm, UserUpdateForm, ProfileUpdateForm, \
     UserParentStudentRegisterForm, StudentRegisterForm
+'''
+making tests for exercise
+'''
 
 
 class AddGradeFormTest(TestCase):

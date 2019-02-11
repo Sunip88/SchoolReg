@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import CreateView, UpdateView
+from django.views.generic import CreateView, UpdateView, ListView
 from .forms import AddGradeForm, AddAdvertForm, AddNoticeForm, AnswerNoticeForm, AddClassAdvertForm, \
     EditAdvertForm, EditClassAdvertForm, EditNoticeForm, AddEventForm
 from .models import Classes, Subject, Student, GradeCategory, Teacher, PresenceList, WorkingHours, Schedule, WEEKDAYS, \
@@ -29,10 +29,10 @@ def testing_func(user, role):
     return False
 
 
-class MainView(LoginRequiredMixin, View):
-    def get(self, request):
-        adverts = Adverts.objects.all()
-        return render(request, 'register/main.html', {'adverts': adverts})
+class MainView(LoginRequiredMixin, ListView):
+    model = Adverts
+    paginate_by = 10
+    template_name = 'register/main.html'
 
 
 class TeacherPanelView(LoginRequiredMixin, UserPassesTestMixin, View):
