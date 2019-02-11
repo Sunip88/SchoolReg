@@ -110,10 +110,10 @@ class StudentView(LoginRequiredMixin, UserPassesTestMixin, View):
         return testing_func(self.request.user, 0)
 
 
-class ClassView(LoginRequiredMixin, UserPassesTestMixin, View):
-    def get(self, request):
-        classes = Classes.objects.all()
-        return render(request, 'register/classes.html', {'classes': classes})
+class ClassView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    model = Classes
+    paginate_by = 25
+    template_name = 'register/classes.html'
 
     def test_func(self):
         return testing_func(self.request.user, 2)
@@ -164,41 +164,14 @@ class DetailsClassView(LoginRequiredMixin, View):
             return False
 
 
-class SubjectsView(LoginRequiredMixin, View):
-    def get(self, request):
-        subjects = Subject.objects.all()
-        return render(request, 'register/subjects.html', {'subjects': subjects})
-#TODO decide
-
-
-class AddSubjectView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
-    permission_required = 'register.add_subject'
-    model = Subject
-    fields = '__all__'
-
-    template_name = 'register/add_class.html'
-    success_url = reverse_lazy("subject-view")
-
-    def get_form(self, form_class=None):
-        form = super(AddSubjectView, self).get_form(form_class)
-        form.fields['classes'].required = False
-        return form
-
-
-class EditSubjectView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
-    permission_required = 'register.change_subject'
-    model = Subject
-    fields = '__all__'
-    template_name = 'register/add_class.html'
-    success_url = reverse_lazy("subject-view")
-
-
-class AddGradeCategoryView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
-    permission_required = 'register.add_gradecategory'
+class AddGradeCategoryView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = GradeCategory
     fields = '__all__'
     template_name = 'register/add_class.html'
     success_url = reverse_lazy("add-grade-category")
+
+    def test_func(self):
+        return testing_func(self.request.user, 2)
 
 
 class AddGradesClass(LoginRequiredMixin, UserPassesTestMixin, View):
