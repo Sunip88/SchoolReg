@@ -54,6 +54,10 @@ class Teacher(models.Model):
     def __str__(self):
         return f'{self.user.first_name} {self.user.last_name}'
 
+    def get_educator(self):
+        educator = self.classes_set.all()
+        return educator
+
 
 class Student(models.Model):
     year_of_birth = models.PositiveIntegerField(validators=[MinValueValidator(1000), MaxValueValidator(3000)],

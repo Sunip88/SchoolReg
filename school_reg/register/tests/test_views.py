@@ -4,7 +4,8 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
-from register.models import Teacher, Classes, Parent, Student, Subject, Lessons, ClassRoom, WorkingHours, Schedule
+from register.models import Teacher, Classes, Parent, Student, Subject, Lessons, ClassRoom, WorkingHours, Schedule, \
+    Grades, GradeCategory
 
 
 class TeacherPanelViewTest(TestCase):
@@ -371,3 +372,465 @@ class ClassViewTest(TestCase):
         response = self.client.get(reverse("class-view"))
         self.assertTrue(login)
         self.assertEqual(response.status_code, 403)
+
+
+class DetailsClassViewTest(TestCase):
+    def setUp(self):
+        # Create three users
+        test_user_1 = User.objects.create_user(username='testuser1',
+                                               email='a@a.com',
+                                               password='testpassword',
+                                               first_name='testing',
+                                               last_name='user')
+        test_user_1.profile.role = 1
+        test_user_1.save()
+        parent = Parent.objects.create(user=test_user_1)
+        test_user_2 = User.objects.create_user(username='testuser2',
+                                               email='a@a.com',
+                                               password='testpassword',
+                                               first_name='testing2',
+                                               last_name='user2')
+        test_user_2.profile.role = 0
+        test_user_2.save()
+
+        test_user_3 = User.objects.create_user(username='testuser3',
+                                               email='a@a.com',
+                                               password='testpassword',
+                                               first_name='testing3',
+                                               last_name='user3')
+        test_user_3.profile.role = 2
+        test_user_3.save()
+        teacher = Teacher.objects.create(user=test_user_3)
+
+        classes_new = Classes.objects.create(educator=teacher, name='1a', description='test')
+
+        student = Student.objects.create(user=test_user_2, year_of_birth=1988, classes=classes_new)
+        parent.students.add(student)
+
+        test_user_4 = User.objects.create_user(username='testuser4',
+                                               email='a@a.com',
+                                               password='testpassword',
+                                               first_name='testing4',
+                                               last_name='user4')
+        test_user_4.profile.role = 1
+        test_user_4.save()
+        parent = Parent.objects.create(user=test_user_4)
+
+        test_user_5 = User.objects.create_user(username='testuser5',
+                                               email='a@a.com',
+                                               password='testpassword',
+                                               first_name='testing5',
+                                               last_name='user5')
+        test_user_5.profile.role = 0
+        test_user_5.save()
+        classes_new_2 = Classes.objects.create(educator=teacher, name='1b', description='test')
+        student = Student.objects.create(user=test_user_5, year_of_birth=1988, classes=classes_new_2)
+
+
+    def test_redirect_if_not_logged_in(self):
+        classes = Classes.objects.all().first()
+        url = reverse("class-details", kwargs={'pk': classes.id})
+        response = self.client.get(url)
+        self.assertRedirects(response, f'/login/?next=/detailed_class/{classes.id}/')
+
+    def test_logged_in_user_teacher(self):
+        login = self.client.login(username='testuser3', password='testpassword')
+        classes = Classes.objects.all().first()
+        url = reverse("class-details", kwargs={'pk': classes.id})
+        response = self.client.get(url)
+        self.assertEqual(str(response.context['user']), 'testuser3')
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'register/detail_classes.html')
+
+    def test_logged_in_user_different_than_teacher(self):
+        login = self.client.login(username='testuser1', password='testpassword')
+        classes = Classes.objects.all().first()
+        url = reverse("class-details", kwargs={'pk': classes.id})
+        response = self.client.get(url)
+        self.assertEqual(str(response.context['user']), 'testuser1')
+        self.assertEqual(response.status_code, 200)
+
+        login = self.client.login(username='testuser2', password='testpassword')
+        response = self.client.get(url)
+        self.assertEqual(str(response.context['user']), 'testuser2')
+        self.assertEqual(response.status_code, 200)
+
+        login = self.client.login(username='testuser4', password='testpassword')
+        response = self.client.get(url)
+        self.assertTrue(login)
+        self.assertEqual(response.status_code, 403)
+
+        login = self.client.login(username='testuser5', password='testpassword')
+        response = self.client.get(url)
+        self.assertTrue(login)
+        self.assertEqual(response.status_code, 403)
+
+
+class AddGradeCategoryViewTest(TestCase):
+    def setUp(self):
+        # Create three users
+        test_user_1 = User.objects.create_user(username='testuser1',
+                                               email='a@a.com',
+                                               password='testpassword',
+                                               first_name='testing',
+                                               last_name='user')
+        test_user_1.profile.role = 1
+        test_user_1.save()
+        parent = Parent.objects.create(user=test_user_1)
+        test_user_2 = User.objects.create_user(username='testuser2',
+                                               email='a@a.com',
+                                               password='testpassword',
+                                               first_name='testing2',
+                                               last_name='user2')
+        test_user_2.profile.role = 0
+        test_user_2.save()
+
+        test_user_3 = User.objects.create_user(username='testuser3',
+                                               email='a@a.com',
+                                               password='testpassword',
+                                               first_name='testing3',
+                                               last_name='user3')
+        test_user_3.profile.role = 2
+        test_user_3.save()
+        teacher = Teacher.objects.create(user=test_user_3)
+
+        classes_new = Classes.objects.create(educator=teacher, name='1a', description='test')
+
+    def test_redirect_if_not_logged_in(self):
+        response = self.client.get(reverse("add-grade-category"))
+        self.assertRedirects(response, '/login/?next=/add_grade_category/')
+
+    def test_logged_in_user_teacher(self):
+        login = self.client.login(username='testuser3', password='testpassword')
+        response = self.client.get(reverse("add-grade-category"))
+        self.assertEqual(str(response.context['user']), 'testuser3')
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'register/add_class.html')
+
+    def test_logged_in_user_different_than_teacher(self):
+        login = self.client.login(username='testuser1', password='testpassword')
+        response = self.client.get(reverse("add-grade-category"))
+        self.assertTrue(login)
+        self.assertEqual(response.status_code, 403)
+
+        login = self.client.login(username='testuser2', password='testpassword')
+        response = self.client.get(reverse("add-grade-category"))
+        self.assertTrue(login)
+        self.assertEqual(response.status_code, 403)
+
+
+class TeacherDetailViewTest(TestCase):
+    def setUp(self):
+        # Create three users
+        test_user_1 = User.objects.create_user(username='testuser1',
+                                               email='a@a.com',
+                                               password='testpassword',
+                                               first_name='testing',
+                                               last_name='user')
+        test_user_1.profile.role = 1
+        test_user_1.save()
+        parent = Parent.objects.create(user=test_user_1)
+        test_user_2 = User.objects.create_user(username='testuser2',
+                                               email='a@a.com',
+                                               password='testpassword',
+                                               first_name='testing2',
+                                               last_name='user2')
+        test_user_2.profile.role = 0
+        test_user_2.save()
+
+        test_user_3 = User.objects.create_user(username='testuser3',
+                                               email='a@a.com',
+                                               password='testpassword',
+                                               first_name='testing3',
+                                               last_name='user3')
+        test_user_3.profile.role = 2
+        test_user_3.save()
+        teacher = Teacher.objects.create(user=test_user_3)
+
+        classes_new = Classes.objects.create(educator=teacher, name='1a', description='test')
+        student = Student.objects.create(user=test_user_2, year_of_birth=1988, classes=classes_new)
+        parent.students.add(student)
+        subject = Subject.objects.create(name='testSubject')
+        subject.classes.add(classes_new)
+        subject.save()
+        category_grade = GradeCategory.objects.create(name="test")
+        grade = Grades.objects.create(subject=subject, student=student, category=category_grade, grade=5)
+
+        test_user_4 = User.objects.create_user(username='testuser4',
+                                               email='a@a.com',
+                                               password='testpassword',
+                                               first_name='testing4',
+                                               last_name='user4')
+        test_user_4.profile.role = 1
+        test_user_4.save()
+        parent = Parent.objects.create(user=test_user_4)
+
+        test_user_5 = User.objects.create_user(username='testuser5',
+                                               email='a@a.com',
+                                               password='testpassword',
+                                               first_name='testing5',
+                                               last_name='user5')
+        test_user_5.profile.role = 0
+        test_user_5.save()
+        classes_new_2 = Classes.objects.create(educator=teacher, name='1b', description='test')
+        student = Student.objects.create(user=test_user_5, year_of_birth=1988, classes=classes_new_2)
+
+    def test_redirect_if_not_logged_in(self):
+        student = Student.objects.all().first()
+        url = reverse("student-details", kwargs={'pk': student.id})
+        response = self.client.get(url)
+        self.assertRedirects(response, f'/login/?next=/detailed_student/{student.id}/')
+
+    def test_logged_in_user_teacher(self):
+        login = self.client.login(username='testuser3', password='testpassword')
+        student = Student.objects.all().first()
+        url = reverse("student-details", kwargs={'pk': student.id})
+        response = self.client.get(url)
+        self.assertEqual(str(response.context['user']), 'testuser3')
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'register/student_details.html')
+
+    def test_logged_in_user_different_than_teacher(self):
+        login = self.client.login(username='testuser1', password='testpassword')
+        student = Student.objects.all().first()
+        url = reverse("student-details", kwargs={'pk': student.id})
+        response = self.client.get(url)
+        self.assertEqual(str(response.context['user']), 'testuser1')
+        self.assertEqual(response.status_code, 200)
+
+        login = self.client.login(username='testuser2', password='testpassword')
+        response = self.client.get(url)
+        self.assertEqual(str(response.context['user']), 'testuser2')
+        self.assertEqual(response.status_code, 200)
+
+        login = self.client.login(username='testuser4', password='testpassword')
+        response = self.client.get(url)
+        self.assertTrue(login)
+        self.assertEqual(response.status_code, 403)
+
+        login = self.client.login(username='testuser5', password='testpassword')
+        response = self.client.get(url)
+        self.assertTrue(login)
+        self.assertEqual(response.status_code, 403)
+
+
+class SchedulesViewTest(TestCase):
+    def setUp(self):
+        # Create three users
+        test_user_1 = User.objects.create_user(username='testuser1',
+                                               email='a@a.com',
+                                               password='testpassword',
+                                               first_name='testing',
+                                               last_name='user')
+        test_user_1.profile.role = 1
+        test_user_1.save()
+        parent = Parent.objects.create(user=test_user_1)
+        test_user_2 = User.objects.create_user(username='testuser2',
+                                               email='a@a.com',
+                                               password='testpassword',
+                                               first_name='testing2',
+                                               last_name='user2')
+        test_user_2.profile.role = 0
+        test_user_2.save()
+
+        test_user_3 = User.objects.create_user(username='testuser3',
+                                               email='a@a.com',
+                                               password='testpassword',
+                                               first_name='testing3',
+                                               last_name='user3')
+        test_user_3.profile.role = 2
+        test_user_3.save()
+        teacher = Teacher.objects.create(user=test_user_3)
+
+        classes_new = Classes.objects.create(educator=teacher, name='1a', description='test')
+
+    def test_redirect_if_not_logged_in(self):
+        response = self.client.get(reverse("schedules"))
+        self.assertRedirects(response, '/login/?next=/schedules/')
+
+    def test_logged_in_user(self):
+        url = reverse("schedules")
+
+        login = self.client.login(username='testuser3', password='testpassword')
+        response = self.client.get(url)
+        self.assertEqual(str(response.context['user']), 'testuser3')
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'register/schedules.html')
+
+        login = self.client.login(username='testuser1', password='testpassword')
+        response = self.client.get(url)
+        self.assertEqual(str(response.context['user']), 'testuser1')
+        self.assertEqual(response.status_code, 200)
+
+        login = self.client.login(username='testuser2', password='testpassword')
+        response = self.client.get(url)
+        self.assertEqual(str(response.context['user']), 'testuser2')
+        self.assertEqual(response.status_code, 200)
+
+
+class ScheduleClassesTest(TestCase):
+    def setUp(self):
+        # Create three users
+        test_user_1 = User.objects.create_user(username='testuser1',
+                                               email='a@a.com',
+                                               password='testpassword',
+                                               first_name='testing',
+                                               last_name='user')
+        test_user_1.profile.role = 1
+        test_user_1.save()
+        parent = Parent.objects.create(user=test_user_1)
+        test_user_2 = User.objects.create_user(username='testuser2',
+                                               email='a@a.com',
+                                               password='testpassword',
+                                               first_name='testing2',
+                                               last_name='user2')
+        test_user_2.profile.role = 0
+        test_user_2.save()
+
+        test_user_3 = User.objects.create_user(username='testuser3',
+                                               email='a@a.com',
+                                               password='testpassword',
+                                               first_name='testing3',
+                                               last_name='user3')
+        test_user_3.profile.role = 2
+        test_user_3.save()
+        teacher = Teacher.objects.create(user=test_user_3)
+
+        classes_new = Classes.objects.create(educator=teacher, name='1a', description='test')
+
+    def test_redirect_if_not_logged_in(self):
+        classes = Classes.objects.first()
+        response = self.client.get(reverse("class-schedule", kwargs={'id_class': classes.id}))
+        self.assertRedirects(response, f'/login/?next=/class_schedule/{classes.id}/')
+
+    def test_logged_in_user(self):
+        classes = Classes.objects.first()
+        url = reverse("class-schedule", kwargs={'id_class': classes.id})
+
+        login = self.client.login(username='testuser3', password='testpassword')
+        response = self.client.get(url)
+        self.assertEqual(str(response.context['user']), 'testuser3')
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'register/schedule_class.html')
+
+        login = self.client.login(username='testuser1', password='testpassword')
+        response = self.client.get(url)
+        self.assertEqual(str(response.context['user']), 'testuser1')
+        self.assertEqual(response.status_code, 200)
+
+        login = self.client.login(username='testuser2', password='testpassword')
+        response = self.client.get(url)
+        self.assertEqual(str(response.context['user']), 'testuser2')
+        self.assertEqual(response.status_code, 200)
+
+
+class ScheduleTeacherViewTest(TestCase):
+    def setUp(self):
+        # Create three users
+        test_user_1 = User.objects.create_user(username='testuser1',
+                                               email='a@a.com',
+                                               password='testpassword',
+                                               first_name='testing',
+                                               last_name='user')
+        test_user_1.profile.role = 1
+        test_user_1.save()
+        parent = Parent.objects.create(user=test_user_1)
+        test_user_2 = User.objects.create_user(username='testuser2',
+                                               email='a@a.com',
+                                               password='testpassword',
+                                               first_name='testing2',
+                                               last_name='user2')
+        test_user_2.profile.role = 0
+        test_user_2.save()
+
+        test_user_3 = User.objects.create_user(username='testuser3',
+                                               email='a@a.com',
+                                               password='testpassword',
+                                               first_name='testing3',
+                                               last_name='user3')
+        test_user_3.profile.role = 2
+        test_user_3.save()
+        teacher = Teacher.objects.create(user=test_user_3)
+
+        classes_new = Classes.objects.create(educator=teacher, name='1a', description='test')
+
+    def test_redirect_if_not_logged_in(self):
+        teacher = Teacher.objects.first()
+        response = self.client.get(reverse("teacher-schedule", kwargs={'id_teacher': teacher.id}))
+        self.assertRedirects(response, f'/login/?next=/teacher_schedule/{teacher.id}/')
+
+    def test_logged_in_user(self):
+        teacher = Teacher.objects.first()
+        url = reverse("teacher-schedule", kwargs={'id_teacher': teacher.id})
+
+        login = self.client.login(username='testuser3', password='testpassword')
+        response = self.client.get(url)
+        self.assertEqual(str(response.context['user']), 'testuser3')
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'register/schedule_class.html')
+
+        login = self.client.login(username='testuser1', password='testpassword')
+        response = self.client.get(url)
+        self.assertEqual(str(response.context['user']), 'testuser1')
+        self.assertEqual(response.status_code, 200)
+
+        login = self.client.login(username='testuser2', password='testpassword')
+        response = self.client.get(url)
+        self.assertEqual(str(response.context['user']), 'testuser2')
+        self.assertEqual(response.status_code, 200)
+
+
+class ScheduleRoomViewTest(TestCase):
+    def setUp(self):
+        # Create three users
+        test_user_1 = User.objects.create_user(username='testuser1',
+                                               email='a@a.com',
+                                               password='testpassword',
+                                               first_name='testing',
+                                               last_name='user')
+        test_user_1.profile.role = 1
+        test_user_1.save()
+        parent = Parent.objects.create(user=test_user_1)
+        test_user_2 = User.objects.create_user(username='testuser2',
+                                               email='a@a.com',
+                                               password='testpassword',
+                                               first_name='testing2',
+                                               last_name='user2')
+        test_user_2.profile.role = 0
+        test_user_2.save()
+
+        test_user_3 = User.objects.create_user(username='testuser3',
+                                               email='a@a.com',
+                                               password='testpassword',
+                                               first_name='testing3',
+                                               last_name='user3')
+        test_user_3.profile.role = 2
+        test_user_3.save()
+        teacher = Teacher.objects.create(user=test_user_3)
+        room = ClassRoom.objects.create(name='test room')
+        classes_new = Classes.objects.create(educator=teacher, name='1a', description='test')
+
+    def test_redirect_if_not_logged_in(self):
+        room = ClassRoom.objects.first()
+        response = self.client.get(reverse("room-schedule", kwargs={'id_room': room.id}))
+        self.assertRedirects(response, f'/login/?next=/room_schedule/{room.id}/')
+
+    def test_logged_in_user(self):
+        room = ClassRoom.objects.first()
+        url = reverse("room-schedule", kwargs={'id_room': room.id})
+
+        login = self.client.login(username='testuser3', password='testpassword')
+        response = self.client.get(url)
+        self.assertEqual(str(response.context['user']), 'testuser3')
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'register/schedule_class.html')
+
+        login = self.client.login(username='testuser1', password='testpassword')
+        response = self.client.get(url)
+        self.assertEqual(str(response.context['user']), 'testuser1')
+        self.assertEqual(response.status_code, 200)
+
+        login = self.client.login(username='testuser2', password='testpassword')
+        response = self.client.get(url)
+        self.assertEqual(str(response.context['user']), 'testuser2')
+        self.assertEqual(response.status_code, 200)

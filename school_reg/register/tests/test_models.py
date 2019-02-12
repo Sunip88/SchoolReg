@@ -97,6 +97,7 @@ class TeacherModelTest(TestCase):
                                    last_name='user')
         user.profile.role = 2
         teacher = Teacher.objects.create(user=user)
+        classes_new = Classes.objects.create(educator=teacher, name='1a', description='test')
 
     def test_user_label(self):
         teacher = Teacher.objects.all().first()
@@ -107,6 +108,11 @@ class TeacherModelTest(TestCase):
         teacher = Teacher.objects.all().first()
         expected_object_name = f'{teacher.user.first_name} {teacher.user.last_name}'
         self.assertEqual(expected_object_name, str(teacher))
+
+    def test_get_educator(self):
+        teacher = Teacher.objects.first()
+        classes = Classes.objects.first()
+        self.assertEqual(classes, teacher.get_educator().first())
 
 
 class StudentModelTest(TestCase):

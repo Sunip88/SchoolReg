@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import CreateView, UpdateView, ListView
+from django.views.generic import CreateView, UpdateView, ListView, DetailView
 from .forms import AddGradeForm, AddAdvertForm, AddNoticeForm, AnswerNoticeForm, AddClassAdvertForm, \
     EditAdvertForm, EditClassAdvertForm, EditNoticeForm, AddEventForm
 from .models import Classes, Subject, Student, GradeCategory, Teacher, PresenceList, WorkingHours, Schedule, WEEKDAYS, \
@@ -32,6 +32,7 @@ def testing_func(user, role):
 class MainView(LoginRequiredMixin, ListView):
     model = Adverts
     paginate_by = 10
+    ordering = ['-date']
     template_name = 'register/main.html'
 
 
@@ -114,6 +115,7 @@ class ClassView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Classes
     paginate_by = 25
     template_name = 'register/classes.html'
+    ordering = ['educator']
 
     def test_func(self):
         return testing_func(self.request.user, 2)
@@ -222,13 +224,9 @@ class AddGradesClass(LoginRequiredMixin, UserPassesTestMixin, View):
         return False
 
 
-class TeacherDetailView(LoginRequiredMixin, View):
-
-    def get(self, request, pk):
-        teacher = get_object_or_404(Teacher, id=pk)
-        educator = teacher.classes_set.all()
-        ctx = {'teacher': teacher, 'educator': educator}
-        return render(request, 'register/teacher_details.html', ctx)
+class TeacherDetailView(LoginRequiredMixin, DetailView):
+    model = Teacher
+    template_name = 'register/teacher_details.html'
 
 
 class StudentDetailView(LoginRequiredMixin, View):
