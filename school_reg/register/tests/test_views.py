@@ -834,3 +834,120 @@ class ScheduleRoomViewTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(str(response.context['user']), 'testuser2')
         self.assertEqual(response.status_code, 200)
+
+
+class AddGradesClassTest(TestCase):
+    def setUp(self):
+        # Create three users
+        test_user_1 = User.objects.create_user(username='testuser1',
+                                               email='a@a.com',
+                                               password='testpassword',
+                                               first_name='testing',
+                                               last_name='user')
+        test_user_1.profile.role = 1
+        test_user_1.save()
+        parent = Parent.objects.create(user=test_user_1)
+        test_user_2 = User.objects.create_user(username='testuser2',
+                                               email='a@a.com',
+                                               password='testpassword',
+                                               first_name='testing2',
+                                               last_name='user2')
+        test_user_2.profile.role = 0
+        test_user_2.save()
+
+        test_user_3 = User.objects.create_user(username='testuser3',
+                                               email='a@a.com',
+                                               password='testpassword',
+                                               first_name='testing3',
+                                               last_name='user3')
+        test_user_3.profile.role = 2
+        test_user_3.save()
+        teacher = Teacher.objects.create(user=test_user_3)
+        room = ClassRoom.objects.create(name='test room')
+        classes_new = Classes.objects.create(educator=teacher, name='1a', description='test')
+        Student.objects.create(year_of_birth=1988, classes=classes_new, user=test_user_2)
+        subject_new = Subject(name='testSubject')
+        subject_new.save()
+        subject_new.classes.add(classes_new)
+        subject_new.save()
+        Lessons.objects.create(classes=classes_new, subject=subject_new, teacher=teacher)
+        category_grade = GradeCategory.objects.create(name="test")
+
+        test_user_4 = User.objects.create_user(username='testuser4',
+                                               email='a@a.com',
+                                               password='testpassword',
+                                               first_name='testing4',
+                                               last_name='user4')
+        test_user_4.profile.role = 2
+        test_user_4.save()
+        teacher2 = Teacher.objects.create(user=test_user_4)
+
+    def test_redirect_if_not_logged_in(self):
+        classes = Classes.objects.first()
+        subject = Subject.objects.first()
+        response = self.client.get(reverse("class-grade-add", kwargs={'id_class': classes.id, 'id_subject': subject.id}))
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, f'/login/?next=/add_grades/{classes.id}/{subject.id}/')
+
+    def test_logged_in_user_teacher(self):
+        classes = Classes.objects.first()
+        subject = Subject.objects.first()
+        url = reverse("class-grade-add", kwargs={'id_class': classes.id, 'id_subject': subject.id})
+        login = self.client.login(username='testuser3', password='testpassword')
+        response = self.client.get(url)
+        self.assertEqual(str(response.context['user']), 'testuser3')
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'register/detail_classes_add_grade.html')
+
+    def test_logged_in_user_different_than_teacher(self):
+        classes = Classes.objects.first()
+        subject = Subject.objects.first()
+        url = reverse("class-grade-add", kwargs={'id_class': classes.id, 'id_subject': subject.id})
+
+        login = self.client.login(username='testuser1', password='testpassword')
+        response = self.client.get(url)
+        self.assertTrue(login)
+        self.assertEqual(response.status_code, 403)
+
+        login = self.client.login(username='testuser2', password='testpassword')
+        response = self.client.get(url)
+        self.assertTrue(login)
+        self.assertEqual(response.status_code, 403)
+
+        login = self.client.login(username='testuser4', password='testpassword')
+        response = self.client.get(url)
+        self.assertTrue(login)
+        self.assertEqual(response.status_code, 403)
+
+    def test_post_good_data_good_user(self):
+        classes = Classes.objects.first()
+        subject = Subject.objects.first()
+        student = Student.objects.first()
+        url = reverse("class-grade-add", kwargs={'id_class': classes.id, 'id_subject': subject.id})
+        category_grade = GradeCategory.objects.first()
+        data = {'category': category_grade.id, 'grade': 5, 'button': student.id}
+        login = self.client.login(username='testuser3', password='testpassword')
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+
+    def test_post_bad_data_good_user(self):
+        classes = Classes.objects.first()
+        subject = Subject.objects.first()
+        student = Student.objects.first()
+        url = reverse("class-grade-add", kwargs={'id_class': classes.id, 'id_subject': subject.id})
+        category_grade = GradeCategory.objects.first()
+        data = {'category': 'bad', 'grade': 5, 'button': student.id}
+        login = self.client.login(username='testuser3', password='testpassword')
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200)
+
+    def test_post_good_data_bad_user(self):
+        classes = Classes.objects.first()
+        subject = Subject.objects.first()
+        student = Student.objects.first()
+        url = reverse("class-grade-add", kwargs={'id_class': classes.id, 'id_subject': subject.id})
+        category_grade = GradeCategory.objects.first()
+        data = {'category': category_grade.id, 'grade': 5, 'button': student.id}
+        login = self.client.login(username='testuser4', password='testpassword')
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 403)
