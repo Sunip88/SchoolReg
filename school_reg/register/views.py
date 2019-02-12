@@ -276,8 +276,6 @@ class PresenceView(LoginRequiredMixin, UserPassesTestMixin, View):
         today = datetime.now().strftime('%Y-%m-%d')
         if not self.my_test(schedule.lesson):
             raise PermissionDenied
-        for i in students:
-            print(i)
         ctx = {'detail_class': detail_class, 'students': students, 'today': today, 'schedule': schedule}
         return render(request, 'register/presence_check.html', ctx)
 
