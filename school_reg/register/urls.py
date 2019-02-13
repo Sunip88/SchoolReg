@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import MainView, ClassView, AddClassView, EditClassView, DetailsClassView, SubjectsView, AddSubjectView, \
-    EditSubjectView, AddGradesClass, AddGradeCategoryView, StudentDetailView, TeacherPanelView, \
+from .views import MainView, ClassView, AddClassView, EditClassView, DetailsClassView, \
+    AddGradesClass, AddGradeCategoryView, StudentDetailView, TeacherPanelView, \
     TeacherSubjectsClassesView, TeacherGradesView, StudentView, PresenceView, ScheduleClasses, \
     ScheduleTeacherView, ScheduleRoomView, SchedulesView, AdvertAddView, NoticeAddView, ParentPanelView, \
     NoticeParentView, NoticeTeacherView, AdvertClassAddView, AdvertTeacherView, AdvertClassEditView, AdvertEditView, \
@@ -18,9 +18,7 @@ urlpatterns = [
     path("edit_events/<int:id_event>/", EditEventView.as_view(), name="edit-event"),
     path("list_events/<int:id_classes>/", ListEventView.as_view(), name="list-event"),
     path("list_events_teacher/", ListEventTeacherView.as_view(), name="list-teacher-event"),
-    path("subjects/", SubjectsView.as_view(), name="subject-view"),
     path("add_class/", AddClassView.as_view(), name='class-add'),
-    path("add_subject/", AddSubjectView.as_view(), name='subject-add'),
     path("add_grade_category/", AddGradeCategoryView.as_view(), name='add-grade-category'),
     path("add_advert/", AdvertAddView.as_view(), name='add-advert'),
     path("edit_advert/<int:id_advert>/", AdvertEditView.as_view(), name='edit-advert'),
@@ -35,7 +33,6 @@ urlpatterns = [
     path("announcements/", AnnouncementView.as_view(), name='announcements'),
     path("announcements_online/", AnnouncementOnlineView.as_view(), name='counter'),
     path("edit_class/<int:pk>/", EditClassView.as_view(), name='class-edit'),
-    path("edit_subject/<int:pk>/", EditSubjectView.as_view(), name='subject-edit'),
     path("detailed_class/<int:pk>/", DetailsClassView.as_view(), name='class-details'),
     path("schedules/", SchedulesView.as_view(), name='schedules'),
     path("class_schedule/<int:id_class>/", ScheduleClasses.as_view(), name='class-schedule'),

@@ -3,17 +3,17 @@
 {% block content %}
     <div class="content-section">
         <div class="media">
-            <img class="rounded-circle article-img" src="{{ teacher.user.profile.image.url }}">
+            <img class="rounded-circle article-img" src="{{ object.user.profile.image.url }}">
             <div class="media-body">
                 <h4 class="account-heading">
-                    Imie i nazwisko: {{ teacher.user.first_name }} {{ teacher.user.last_name }}
+                    Imie i nazwisko: {{ object.user.first_name }} {{ object.user.last_name }}
                 </h4>
-                <h4>Email: {{ teacher.user.email }}</h4>
-                {% if user.profile.role == 2 and teacher.user.profile.phone %}
-                    <h4>Telefon: {{ teacher.user.profile.phone }}</h4>
+                <h4>Email: {{ object.user.email }}</h4>
+                {% if user.profile.role == 2 and object.user.profile.phone %}
+                    <h4>Telefon: {{ object.user.profile.phone }}</h4>
                 {% endif %}
-                {% if educator %}
-                    {% for edu in educator %}
+                {% if object.get_educator %}
+                    {% for edu in object.get_educator %}
                         <h4>Wychowawca klasy: <a href="{% url 'class-details' edu.id %}">{{ edu.name }}</a></h4>
                     {% endfor %}
                 {% endif %}

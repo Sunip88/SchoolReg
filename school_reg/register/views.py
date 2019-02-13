@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import CreateView, UpdateView
+from django.views.generic import CreateView, UpdateView, ListView, DetailView
 from .forms import AddGradeForm, AddAdvertForm, AddNoticeForm, AnswerNoticeForm, AddClassAdvertForm, \
     EditAdvertForm, EditClassAdvertForm, EditNoticeForm, AddEventForm
 from .models import Classes, Subject, Student, GradeCategory, Teacher, PresenceList, WorkingHours, Schedule, WEEKDAYS, \
@@ -29,10 +29,11 @@ def testing_func(user, role):
     return False
 
 
-class MainView(LoginRequiredMixin, View):
-    def get(self, request):
-        adverts = Adverts.objects.all()
-        return render(request, 'register/main.html', {'adverts': adverts})
+class MainView(LoginRequiredMixin, ListView):
+    model = Adverts
+    paginate_by = 10
+    ordering = ['-date']
+    template_name = 'register/main.html'
 
 
 class TeacherPanelView(LoginRequiredMixin, UserPassesTestMixin, View):
@@ -110,10 +111,11 @@ class StudentView(LoginRequiredMixin, UserPassesTestMixin, View):
         return testing_func(self.request.user, 0)
 
 
-class ClassView(LoginRequiredMixin, UserPassesTestMixin, View):
-    def get(self, request):
-        classes = Classes.objects.all()
-        return render(request, 'register/classes.html', {'classes': classes})
+class ClassView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    model = Classes
+    paginate_by = 25
+    template_name = 'register/classes.html'
+    ordering = ['educator']
 
     def test_func(self):
         return testing_func(self.request.user, 2)
@@ -164,41 +166,14 @@ class DetailsClassView(LoginRequiredMixin, View):
             return False
 
 
-class SubjectsView(LoginRequiredMixin, View):
-    def get(self, request):
-        subjects = Subject.objects.all()
-        return render(request, 'register/subjects.html', {'subjects': subjects})
-#TODO decide
-
-
-class AddSubjectView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
-    permission_required = 'register.add_subject'
-    model = Subject
-    fields = '__all__'
-
-    template_name = 'register/add_class.html'
-    success_url = reverse_lazy("subject-view")
-
-    def get_form(self, form_class=None):
-        form = super(AddSubjectView, self).get_form(form_class)
-        form.fields['classes'].required = False
-        return form
-
-
-class EditSubjectView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
-    permission_required = 'register.change_subject'
-    model = Subject
-    fields = '__all__'
-    template_name = 'register/add_class.html'
-    success_url = reverse_lazy("subject-view")
-
-
-class AddGradeCategoryView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
-    permission_required = 'register.add_gradecategory'
+class AddGradeCategoryView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = GradeCategory
     fields = '__all__'
     template_name = 'register/add_class.html'
     success_url = reverse_lazy("add-grade-category")
+
+    def test_func(self):
+        return testing_func(self.request.user, 2)
 
 
 class AddGradesClass(LoginRequiredMixin, UserPassesTestMixin, View):
@@ -249,13 +224,9 @@ class AddGradesClass(LoginRequiredMixin, UserPassesTestMixin, View):
         return False
 
 
-class TeacherDetailView(LoginRequiredMixin, View):
-
-    def get(self, request, pk):
-        teacher = get_object_or_404(Teacher, id=pk)
-        educator = teacher.classes_set.all()
-        ctx = {'teacher': teacher, 'educator': educator}
-        return render(request, 'register/teacher_details.html', ctx)
+class TeacherDetailView(LoginRequiredMixin, DetailView):
+    model = Teacher
+    template_name = 'register/teacher_details.html'
 
 
 class StudentDetailView(LoginRequiredMixin, View):
@@ -305,8 +276,6 @@ class PresenceView(LoginRequiredMixin, UserPassesTestMixin, View):
         today = datetime.now().strftime('%Y-%m-%d')
         if not self.my_test(schedule.lesson):
             raise PermissionDenied
-        for i in students:
-            print(i)
         ctx = {'detail_class': detail_class, 'students': students, 'today': today, 'schedule': schedule}
         return render(request, 'register/presence_check.html', ctx)
 
@@ -564,9 +533,9 @@ class NoticeParentView(LoginRequiredMixin, UserPassesTestMixin, View):
 
     def post(self, request, id_student):
         button = request.POST.get('button')
-        notice = Notice.objects.get(id=button)
         student = get_object_or_404(Student, id=id_student)
         notices = student.notice_set.all()
+        notice = get_object_or_404(Notice, id=button)
         form = self.class_form(request.POST, instance=notice)
         if form.is_valid():
             form.save()
@@ -634,16 +603,19 @@ class AnnouncementView(LoginRequiredMixin, UserPassesTestMixin, View):
 
     def post(self, request):
         approved = request.POST.get("approved")
-        event, id_ann = approved.split("_")
-        if event == 'deleted':
-            announcement = get_object_or_404(Announcements, id=id_ann)
-            announcement.deleted = True
-            announcement.save()
+        if approved:
+            event, id_ann = approved.split("_")
+            if event == 'deleted':
+                announcement = get_object_or_404(Announcements, id=id_ann)
+                announcement.deleted = True
+                announcement.save()
+            else:
+                announcement = get_object_or_404(Announcements, id=id_ann)
+                announcement.read = True
+                announcement.save()
+            return HttpResponse('great')
         else:
-            announcement = get_object_or_404(Announcements, id=id_ann)
-            announcement.read = True
-            announcement.save()
-        return HttpResponse('great')
+            raise PermissionDenied
 
     def test_func(self):
         return testing_func(self.request.user, 1)
@@ -659,6 +631,8 @@ class AnnouncementOnlineView(LoginRequiredMixin, View):
             for child in children:
                 count += Announcements.objects.filter(user=child.user, read=False, deleted=False).count()
             return HttpResponse(str(count))
+        else:
+            raise PermissionDenied
 
 
 class AddEventView(LoginRequiredMixin, UserPassesTestMixin, View):
