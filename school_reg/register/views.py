@@ -533,9 +533,9 @@ class NoticeParentView(LoginRequiredMixin, UserPassesTestMixin, View):
 
     def post(self, request, id_student):
         button = request.POST.get('button')
-        notice = Notice.objects.get(id=button)
         student = get_object_or_404(Student, id=id_student)
         notices = student.notice_set.all()
+        notice = get_object_or_404(Notice, id=button)
         form = self.class_form(request.POST, instance=notice)
         if form.is_valid():
             form.save()
@@ -603,16 +603,19 @@ class AnnouncementView(LoginRequiredMixin, UserPassesTestMixin, View):
 
     def post(self, request):
         approved = request.POST.get("approved")
-        event, id_ann = approved.split("_")
-        if event == 'deleted':
-            announcement = get_object_or_404(Announcements, id=id_ann)
-            announcement.deleted = True
-            announcement.save()
+        if approved:
+            event, id_ann = approved.split("_")
+            if event == 'deleted':
+                announcement = get_object_or_404(Announcements, id=id_ann)
+                announcement.deleted = True
+                announcement.save()
+            else:
+                announcement = get_object_or_404(Announcements, id=id_ann)
+                announcement.read = True
+                announcement.save()
+            return HttpResponse('great')
         else:
-            announcement = get_object_or_404(Announcements, id=id_ann)
-            announcement.read = True
-            announcement.save()
-        return HttpResponse('great')
+            raise PermissionDenied
 
     def test_func(self):
         return testing_func(self.request.user, 1)
@@ -628,6 +631,8 @@ class AnnouncementOnlineView(LoginRequiredMixin, View):
             for child in children:
                 count += Announcements.objects.filter(user=child.user, read=False, deleted=False).count()
             return HttpResponse(str(count))
+        else:
+            raise PermissionDenied
 
 
 class AddEventView(LoginRequiredMixin, UserPassesTestMixin, View):

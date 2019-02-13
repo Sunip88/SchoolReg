@@ -55,8 +55,7 @@ class Teacher(models.Model):
         return f'{self.user.first_name} {self.user.last_name}'
 
     def get_educator(self):
-        educator = self.classes_set.all()
-        return educator
+        return self.classes_set.all()
 
 
 class Student(models.Model):
